@@ -26,8 +26,50 @@ function dateCompare(reservationDate, currentDate) {
   }
   return false
 }
+
+/**
+ * async function list(req, res) {
+  const { date, mobile_number } = req.query;
+
+  try {
+    if (date) {
+      // If 'date' query parameter is present, list reservations for that date
+      const result = await service.list(date);
+      const sorted = result.sort((res1, res2) => {
+        const today = new Date();
+        const time1 = new Date(today.toDateString() + ' ' + res1.reservation_time);
+        const time2 = new Date(today.toDateString() + ' ' + res2.reservation_time);
+        return time1 - time2;
+      });
+      res.json({ data: sorted });
+    } else if (mobile_number) {
+      // If 'mobile_number' query parameter is present, list reservations by mobile number
+      const reservations = await service.listByNum(mobile_number);
+      if (reservations) {
+        res.json(reservations);
+      } else {
+        res.status(404).json({ error: 'No reservations found for the provided mobile number.' });
+      }
+    } else {
+      // If neither 'date' nor 'mobile_number' query parameters are present,
+      // list reservations for the current date as a fallback
+      const result = await service.list(getCurrentDate());
+      const sorted = result.sort((res1, res2) => {
+        const today = new Date();
+        const time1 = new Date(today.toDateString() + ' ' + res1.reservation_time);
+        const time2 = new Date(today.toDateString() + ' ' + res2.reservation_time);
+        return time1 - time2;
+      });
+      res.json({ data: sorted });
+    }
+  } catch (error) {
+    res.status(500).json({ error: 'Internal server error.' });
+  }
+}
+ */
+
 async function list(req, res) {
-  const {date} = req.query
+  const {date, mobile_number} = req.query
   if (date) {
   const result = await service.list(date)
   const sorted = result.sort((res1, res2) => {
@@ -37,6 +79,11 @@ async function list(req, res) {
     return time1 - time2;
   });
   res.json({data: sorted})    
+  } else if (mobile_number) {
+    const reservations = await service.listByNum(mobile_number)
+    if (reservations) {
+      return res.json(reservations)
+    }
   } else {
     const result = await service.list(getCurrentDate())
     const sorted = result.sort((res1, res2) => {
@@ -45,8 +92,9 @@ async function list(req, res) {
       const time2 = new Date(today.toDateString() + ' ' + res2.reservation_time);
       return time1 - time2;
     });
-    res.json({data: sorted})
+    res.json({data: sorted})    
   }
+
 
 }
 

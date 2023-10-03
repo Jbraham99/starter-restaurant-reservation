@@ -20,7 +20,8 @@ import SearchPage from "../reservations/SearchPage";
 function Routes() {
   const query = useQuery();
   const date = query.get("date")
-  // console.log(date)
+  const mobile_number = query.get("mobile_number")
+  console.log(mobile_number)
   return (
     <Switch>
       <Route exact={true} path="/">

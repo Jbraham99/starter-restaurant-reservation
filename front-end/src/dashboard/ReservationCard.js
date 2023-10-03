@@ -39,6 +39,7 @@ function ReservationCard({ reservation }) {
       </h5>
       <h6 data-reservation-id-status={reservation.reservation_id}>{status}</h6>
       <p>Ph#: {mobile_number}</p>
+      <button>Edit</button>
       {status === "Booked" ? (
         <a href={`/reservations/${reservation_id}/seat`}>
           <button onClick={updateReservation} value={reservation_id}>

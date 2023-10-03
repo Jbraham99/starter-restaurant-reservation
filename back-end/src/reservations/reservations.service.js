@@ -44,10 +44,19 @@ function finish(reservation) {
       .then(updated => updated)
 }
 
+function listByNum(number) {
+    return knex("reservations")
+      .select("*")
+      .where({
+        mobile_number: number
+      })
+}
+
 module.exports = {
     list,
     create,
     read,
     update,
-    finish
+    finish,
+    listByNum
 }
