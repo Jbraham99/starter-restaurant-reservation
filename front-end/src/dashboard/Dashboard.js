@@ -26,7 +26,7 @@ function Dashboard({ date }) {
     async function getTables() {
       try {
         const response = await fetch(
-        'http://localhost:5001/tables',
+        'https://restaurant-reservations-back-end-jl5i.onrender.com/tables',
         {
           method: "GET",
           body: JSON.stringify(),
@@ -71,7 +71,7 @@ function Dashboard({ date }) {
     const finishedReservation = reservations.find((res)=> res.reservation_id === finishedTable.reservation_id)
     if (window.confirm(`Is this table ready to seat new guests? This cannot be undone.`)) {
       await fetch(
-        `http://localhost:5001/tables/${tableNum}/seat`,
+        `https://restaurant-reservations-back-end-jl5i.onrender.com/tables/${tableNum}/seat`,
         {
           method: "DELETE",
           body: JSON.stringify(finishedTable),
@@ -81,7 +81,7 @@ function Dashboard({ date }) {
         }
       );
       await fetch(
-        `http://localhost:5001/reservations/${finishedReservation.reservation_id}/status`,
+        `https://restaurant-reservations-back-end-jl5i.onrender.com/reservations/${finishedReservation.reservation_id}/status`,
         {
           method: "PUT",
           body: JSON.stringify({...finishedReservation, "status": "Finished"}),

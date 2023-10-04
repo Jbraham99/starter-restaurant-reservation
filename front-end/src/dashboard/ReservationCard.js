@@ -22,7 +22,7 @@ function ReservationCard({ reservation }) {
   //Updating reservation once they've been seated
   const updateReservation = async (e) => {
     e.preventDefault();
-    await fetch(`http://localhost:5001/reservations/${e.target.value}/status`, {
+    await fetch(`https://restaurant-reservations-back-end-jl5i.onrender.com/reservations/${e.target.value}/status`, {
       method: "DELETE",
       body: JSON.stringify({ ...reservation, status: "Seated" }),
       headers: {
@@ -37,7 +37,7 @@ function ReservationCard({ reservation }) {
     e.preventDefault();
     if (window.confirm(`Do you want to cancel this reservation? This cannot be undone.`)) {
         await fetch(
-            `http://localhost:5001/reservations/${reservation_id}/status`,
+            `https://restaurant-reservations-back-end-jl5i.onrender.com/reservations/${reservation_id}/status`,
             {
                 method: "PUT",
                 body: JSON.stringify({...reservation, "status": "cancelled"}),

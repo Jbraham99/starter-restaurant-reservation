@@ -18,7 +18,7 @@ function TablesForm() {
     }
     const submitHandler = async (e) => {
         e.preventDefault()
-        await fetch(`http://localhost:5001/tables/new`, {
+        await fetch(`https://restaurant-reservations-back-end-jl5i.onrender.com/tables/new`, {
             method: 'POST',
             headers: {"Content-Type": "application/json"},
             body: JSON.stringify(table)

@@ -41,7 +41,7 @@ function ReservationForm({date, reservation}) {
     const submitHandler = async (e) => {
         e.preventDefault()
         if (reservation) {
-            await fetch(`http://localhost:5001/reservations/${reservation.reservation_id}/edit`, {
+            await fetch(`https://restaurant-reservations-back-end-jl5i.onrender.com/reservations/${reservation.reservation_id}/edit`, {
                 method: 'PUT',
                 headers: {"Content-Type": "application/json"},
                 body: JSON.stringify(editFormData)
@@ -50,7 +50,7 @@ function ReservationForm({date, reservation}) {
             })
             history.push(`/dashboard?date=${editFormData.reservation_date}`)
         } else {
-            await fetch(`http://localhost:5001/reservations/new`, {
+            await fetch(`https://restaurant-reservations-back-end-jl5i.onrender.com/reservations/new`, {
                 method: 'POST',
                 headers: {"Content-Type": "application/json"},
                 body: JSON.stringify(form)

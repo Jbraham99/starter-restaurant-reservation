@@ -9,7 +9,7 @@ function ReservationEditForm({date}) {
     useEffect(()=>{
         async function getReservation(id){
             const result = await fetch(
-                `http://localhost:5001/reservations/${id}/edit`,
+                `https://restaurant-reservations-back-end-jl5i.onrender.com/reservations/${id}/edit`,
                 {
                     method: "GET",
                     body: JSON.stringify(),

@@ -24,7 +24,7 @@ function Seating() {
     useEffect(()=>{
       async function getReservation(id){
         const response = await fetch(
-          `http://localhost:5001/reservations/${id}/seat`,
+          `https://restaurant-reservations-back-end-jl5i.onrender.com/reservations/${id}/seat`,
           {
             method: "GET",
             headers: {
@@ -42,7 +42,7 @@ function Seating() {
         async function getTables() {
           try {
             const response = await fetch(
-            'http://localhost:5001/tables',
+            'https://restaurant-reservations-back-end-jl5i.onrender.com/tables',
             {
               method: "GET",
               body: JSON.stringify(),
@@ -86,7 +86,7 @@ function Seating() {
         e.preventDefault();
         console.log(table)
         const response = await fetch(
-          `http://localhost:5001/tables/${table.table_id}/seat`,
+          `https://restaurant-reservations-back-end-jl5i.onrender.com/tables/${table.table_id}/seat`,
           {
             method: "PUT",
             body: JSON.stringify(table),

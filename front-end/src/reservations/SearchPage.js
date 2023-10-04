@@ -24,7 +24,7 @@ function SearchPage() {
         setClicked(true)
         console.log(form)
         const response = await fetch(
-            `http://localhost:5001/reservations?mobile_number=${form.mobile_number}`,
+            `https://restaurant-reservations-back-end-jl5i.onrender.com/reservations?mobile_number=${form.mobile_number}`,
             {
                 method: 'GET',
                 headers: {
