@@ -9,6 +9,7 @@ import useQuery from "../utils/useQuery";
 import TablesForm from "../tables/tableForm";
 import Seating from "../seating/Seating";
 import SearchPage from "../reservations/SearchPage";
+import ReservationEditForm from "../reservations/ReservationEditForm";
 
 /**
  * Defines all the routes for the application.
@@ -51,6 +52,11 @@ function Routes() {
       <Route path="/search">
         <SearchPage />
       </Route>
+
+      <Route path="/reservations/:reservation_id/edit">
+        <ReservationEditForm date={today()}/>
+      </Route>
+
       <Route>
         <NotFound />
       </Route>

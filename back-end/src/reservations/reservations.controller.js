@@ -205,6 +205,13 @@ async function update(req, res, next) {
   res.status(200).json("Successful delete")
 }
 
+async function edit(req, res, next) {
+  const bodyData = req.body
+  console.log("res w/ edits: ", bodyData)
+  const update = await service.edit(bodyData)
+  res.status(200).json(update)
+}
+
 module.exports = {
   list,
   create: [
@@ -225,5 +232,9 @@ module.exports = {
   delete: [
     reservationExists,
     destroy
+  ],
+  edit: [
+    reservationExists,
+    edit
   ]
 };

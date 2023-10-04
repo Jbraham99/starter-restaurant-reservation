@@ -52,11 +52,20 @@ function listByNum(number) {
       })
 }
 
+function edit(reservation) {
+  return knex("reservations")
+    .where({
+      reservation_id: reservation.reservation_id
+    })
+    .update(reservation)
+}
+
 module.exports = {
     list,
     create,
     read,
     update,
     finish,
-    listByNum
+    listByNum,
+    edit
 }

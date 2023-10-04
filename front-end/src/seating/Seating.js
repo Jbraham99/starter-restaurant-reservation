@@ -7,6 +7,7 @@ function Seating() {
     const reservation_number = Number(reservation_id)
     const [tables, setTables] = useState(null)
     const [table, setTable] = useState(null)
+    const [reservation, setReservation] = useState(null)
     const initFormState = {
         "table_name": "",
         "capacity": "",
@@ -20,6 +21,23 @@ function Seating() {
         e.preventDefault()
         history.goBack()
     }
+    useEffect(()=>{
+      async function getReservation(id){
+        const response = await fetch(
+          `http://localhost:5001/reservations/${id}/seat`,
+          {
+            method: "GET",
+            headers: {
+              "Content-type": "application/json;charset=UTF-8"
+            }
+          }
+        );
+        const reservation = await response.json();
+        setReservation(reservation.data)
+      }
+      getReservation(reservation_id)
+    }, [reservation_id])
+    console.log(reservation)
     useEffect(()=> {
         async function getTables() {
           try {
@@ -66,6 +84,7 @@ function Seating() {
      */
     const submitHandler = async (e) => {
         e.preventDefault();
+        console.log(table)
         const response = await fetch(
           `http://localhost:5001/tables/${table.table_id}/seat`,
           {
@@ -87,9 +106,10 @@ function Seating() {
         <h3>Select a table:</h3>
         <select name="table_id" onChange={changeHandler} required>
             <option selected="true" disabled="disabled">Select a table</option>
-            {tables ? <>
+            {tables && reservation? <>
             {tables.map((table)=>{
               if (table.status === "Free") {
+                if (table.capacity >= reservation.people)
                 return <option key={table.table_id} value={table.table_id} name={table.capacity}>{`${table.table_name} - ${table.capacity} guest(s)`}</option>                
               }
             })}

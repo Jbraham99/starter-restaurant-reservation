@@ -69,7 +69,7 @@ function Dashboard({ date }) {
     console.log(finishedTable)
     console.log(reservations)
     const finishedReservation = reservations.find((res)=> res.reservation_id === finishedTable.reservation_id)
-    if (window.confirm(`"Is this table ready to seat new guests? This cannot be undone.`)) {
+    if (window.confirm(`Is this table ready to seat new guests? This cannot be undone.`)) {
       await fetch(
         `http://localhost:5001/tables/${tableNum}/seat`,
         {
