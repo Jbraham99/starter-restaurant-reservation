@@ -6,11 +6,14 @@ function list(date) {
     .where({
         reservation_date: date
     })
+    .whereNot({
+      status: "finished"
+    })
 }
 
 function create(newReservation) {
     return knex("reservations")
-    .insert(newReservation)
+    .insert(newReservation, "*")
     .then(reservation => reservation[0])
 }
 
@@ -20,36 +23,26 @@ function read(reservaiton_id) {
       .where({
         reservation_id: reservaiton_id
       })
+      .then(reservation => reservation[0])
 }
 
-function update(updatedReservation) {
+function update(resStatus) {
     return knex("reservations")
       .where({
-        reservation_id: updatedReservation.reservation_id
+        reservation_id: resStatus.reservation_id
       })
       .update({
-        status: updatedReservation.status
+        status: resStatus.status
       })
       .then(updated => updated)
 }
 
-function finish(reservation) {
-    return knex("reservations")
-      .where({
-        reservation_id: reservation.reservation_id
-      })
-      .update({
-        status: reservation.status
-      })
-      .then(updated => updated)
-}
 
 function listByNum(number) {
     return knex("reservations")
       .select("*")
-      .where({
-        mobile_number: number
-      })
+      .where("mobile_number", "like",  `%${number}%`)
+
 }
 
 function edit(reservation) {
@@ -57,7 +50,8 @@ function edit(reservation) {
     .where({
       reservation_id: reservation.reservation_id
     })
-    .update(reservation)
+    .update({...reservation})
+    .then(res => res[0])
 }
 
 module.exports = {
@@ -65,7 +59,6 @@ module.exports = {
     create,
     read,
     update,
-    finish,
     listByNum,
     edit
 }

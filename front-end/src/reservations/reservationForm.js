@@ -13,7 +13,9 @@ const dateCompare = (reservationDate, currentDate) => {
 }
 
 function ReservationForm({date, reservation}) {
-    console.log(reservation)
+    if (reservation) {
+        console.log(reservation)
+    }
     const history = useHistory()
     const [editFormData, setEditFormData] = useState(reservation)
     const initFormState = {
@@ -44,18 +46,19 @@ function ReservationForm({date, reservation}) {
             await fetch(`https://restaurant-reservations-back-end-jl5i.onrender.com/reservations/${reservation.reservation_id}/edit`, {
                 method: 'PUT',
                 headers: {"Content-Type": "application/json"},
-                body: JSON.stringify(editFormData)
+                body: JSON.stringify({data: editFormData})
             }).then(()=> {
                 console.log("saved form ", editFormData)
             })
             history.push(`/dashboard?date=${editFormData.reservation_date}`)
         } else {
-            await fetch(`https://restaurant-reservations-back-end-jl5i.onrender.com/reservations/new`, {
+            await fetch('https://restaurant-reservations-back-end-jl5i.onrender.com/reservations', {
                 method: 'POST',
                 headers: {"Content-Type": "application/json"},
-                body: JSON.stringify(form)
-            }).then(()=> {
-                console.log("saved form ", form)
+                body: JSON.stringify({data: form})
+            }).then(async (returned)=> {
+                const response = await returned.json()
+                console.log( "saved form ", response)
             })
             history.push(`/dashboard?date=${form.reservation_date}`)            
         }

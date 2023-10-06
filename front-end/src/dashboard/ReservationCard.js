@@ -1,5 +1,4 @@
 import React from "react";
-import { useState } from "react";
 import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
 
 /**
@@ -24,7 +23,7 @@ function ReservationCard({ reservation }) {
     e.preventDefault();
     await fetch(`https://restaurant-reservations-back-end-jl5i.onrender.com/reservations/${e.target.value}/status`, {
       method: "DELETE",
-      body: JSON.stringify({ ...reservation, status: "Seated" }),
+      body: JSON.stringify({data: { ...reservation, status: "Seated" }}),
       headers: {
         "Content-type": "application/json;charset=UTF-8",
       },

@@ -4,8 +4,6 @@ import { listReservations } from "../utils/api";
 import ErrorAlert from "../layout/ErrorAlert";
 import ReservationCard from "./ReservationCard";
 import { next, previous, today } from "../utils/date-time";
-import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
-
 /**
  * Defines the dashboard page.
  * @param date
@@ -13,13 +11,11 @@ import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
  * @returns {JSX.Element}
  */
 function Dashboard({ date }) {
-  const history = useHistory();
   //State variables
   const [reservations, setReservations] = useState([]);
   const [reservationsError, setReservationsError] = useState(null);
   const [dashDate, setDashDate] = useState(date);
   const [tables, setTables] = useState(null)
-  const [tableToDelete, setTableToDelete] = useState(null)
   // console.log(tables)
   useEffect(loadDashboard, [date]);
   useEffect(()=> {
@@ -74,7 +70,7 @@ function Dashboard({ date }) {
         `https://restaurant-reservations-back-end-jl5i.onrender.com/tables/${tableNum}/seat`,
         {
           method: "DELETE",
-          body: JSON.stringify(finishedTable),
+          body: JSON.stringify({data: finishedTable}),
           headers: {
             "Content-type": "application/json;charset=UTF-8"
           }
@@ -84,7 +80,7 @@ function Dashboard({ date }) {
         `https://restaurant-reservations-back-end-jl5i.onrender.com/reservations/${finishedReservation.reservation_id}/status`,
         {
           method: "PUT",
-          body: JSON.stringify({...finishedReservation, "status": "Finished"}),
+          body: JSON.stringify({data: {...finishedReservation, "status": "Finished"}}),
           headers: {
             "Content-type": "application/json;charset=UTF-8"
           }
@@ -112,6 +108,7 @@ function Dashboard({ date }) {
       {!reservations ? <ErrorAlert error={reservationsError} /> : (
         <div>
           {reservations.map((reservation)=> {
+            console.log("RESERVATION DATE LIST", reservations)
             if (dashDate === reservation.reservation_date) {
               if (reservation.status === "Booked" || reservation.status === "Seated") {
                 return <ReservationCard key={reservation.reservation_id} reservation={reservation}/> 
@@ -120,6 +117,7 @@ function Dashboard({ date }) {
             } else {
               return ""
             }
+            return ""
           })}
         </div>
       )}

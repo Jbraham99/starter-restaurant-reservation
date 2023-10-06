@@ -3,12 +3,13 @@ const knex = require("../db/connection")
 function create(newTable) {
     return knex("tables")
       .insert(newTable)
-      .then(tables => tables[0])
+      .returning("*")
 }
 
 function list() {
     return knex("tables")
       .select("*")
+      .orderBy("table_name", "asc")
 }
 
 function read(tableId) {
@@ -29,6 +30,26 @@ function update(newTable) {
     .update(newTable, "*")
 }
 
+function destroy(table) {
+  return knex("reservations")
+    .where({
+      "reservation_id": table.reservation_id
+    })
+    .update({
+      "status": table.status
+    })
+}
+
+//RESERVATIONS
+function updateReservation(reservation) {
+  return knex("reservations")
+    .where({
+      "reservation_id": reservation.reservation_id
+    })
+    .update({
+      status: reservation.status
+    })
+}
 function reservation(reservation_id) {
   return knex("reservations")
     .select("*")
@@ -37,23 +58,12 @@ function reservation(reservation_id) {
     })
     .then(reservation => reservation[0])
 }
-
-function destroy(table) {
-  return knex("tables")
-    .where({
-      "table_id": table.table_id
-    })
-    .update({
-      "reservation_id": 0,
-      "status": "Free"
-    })
-}
-
 module.exports = {
     list,
     create,
     read,
     update,
     destroy,
-    reservation
+    reservation,
+    updateReservation
 }
