@@ -4,7 +4,7 @@
 const { first } = require("../db/connection")
 const service = require("./reservations.service")
 
-const closedDay = [1]
+const closedDay = [2]
 
 /**
  * get reservation date
@@ -173,17 +173,20 @@ function noBeforeCurrentDate(req, res, next) {
 }
 //Function that doesn't allow booking on Tuesdays
 function closedTuesdays(req, res, next) {
+
   const {newReservation} = res.locals;//reservation date gotten
   const resDate = new Date(newReservation.reservation_date)
+  console.log("###", resDate)  
   const dayOfWeek = resDate.getUTCDay()
     // if (dayOfWeek === 2) {
     //closedDay = [2]
     console.log("DAY OF WEEK", dayOfWeek)
     if (closedDay.includes(dayOfWeek)) {
-    return next({
-      status: 400,
-      message: "closed on Tuesdays, sorry for the inconvenience."
-    })
+      console.log("INSIDE IF ")
+      return next({
+        status: 400,
+        message: "closed on Tuesdays, sorry for the inconvenience."
+      })
   }
   next()
 }
