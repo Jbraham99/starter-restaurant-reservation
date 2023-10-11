@@ -61,7 +61,7 @@ describe("US-05 - Finish an occupied table - E2E", () => {
         path: ".screenshots/us-05-dashboard-finish-button-before.png",
         fullPage: true,
       });
-
+      console.log("****TEST***")
       const containsOccupied = await containsText(
         page,
         `[data-table-id-status="${table.table_id}"]`,

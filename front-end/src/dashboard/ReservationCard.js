@@ -1,11 +1,16 @@
-import React from "react";
+import React, { useState } from "react";
 import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
-
+import { API_BASE_URL } from "../utils/api";
+import { today } from "../utils/date-time";
 /**
  * PUT request only works if I prevent default of the anchor tag
  */
 
+// && reservation_date == today()
+
 function ReservationCard({ reservation }) {
+  const [error, setError] = useState(null)
+  const [seated, setSeated] = useState(false)
   const history = useHistory();
   const {
     reservation_id,
@@ -21,22 +26,29 @@ function ReservationCard({ reservation }) {
   //Updating reservation once they've been seated
   const updateReservation = async (e) => {
     e.preventDefault();
-    await fetch(`https://restaurant-reservations-back-end-jl5i.onrender.com/reservations/${e.target.value}/status`, {
+    await fetch(`${API_BASE_URL}/reservations/${e.target.value}/status`, {
       method: "DELETE",
       body: JSON.stringify({data: { ...reservation, status: "Seated" }}),
       headers: {
         "Content-type": "application/json;charset=UTF-8",
       },
-    });
-    console.log("saved table has been seated");
-    history.push(`/reservations/${e.target.value}/seat`);
+    }).then(async (returned)=> {
+      const response = await returned.json()
+      if (response.error) {
+        setSeated(true)
+        setError(response.error)
+      } else {
+          // console.log("saved table has been seated");
+          history.push(`/reservations/${e.target.value}/seat`);        
+      }
+    })
   };
   //Canceling a reservation
   const cancelReservation = async (e) => {
     e.preventDefault();
     if (window.confirm(`Do you want to cancel this reservation? This cannot be undone.`)) {
         await fetch(
-            `https://restaurant-reservations-back-end-jl5i.onrender.com/reservations/${reservation_id}/status`,
+            `${API_BASE_URL}/reservations/${reservation_id}/status`,
             {
                 method: "PUT",
                 body: JSON.stringify({...reservation, "status": "cancelled"}),
@@ -50,6 +62,7 @@ function ReservationCard({ reservation }) {
   }
   return (
     <div>
+      {seated && error ? <div className="alert alert-danger">{error}</div> : ""}
     <div className="bg-warning">
       <h2>{`${last_name}, ${first_name}(${people})`}</h2>
       <h5>
@@ -61,7 +74,8 @@ function ReservationCard({ reservation }) {
         <button >Edit</button>        
       </a>
 
-      {status === "Booked" ? (
+      {status === "Booked"? (
+
         <a href={`/reservations/${reservation_id}/seat`}>
           <button onClick={updateReservation} value={reservation_id}>
             Seat

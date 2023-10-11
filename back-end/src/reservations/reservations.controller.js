@@ -4,6 +4,8 @@
 const { first } = require("../db/connection")
 const service = require("./reservations.service")
 
+const closedDay = [1]
+
 /**
  * get reservation date
  * get current date
@@ -173,8 +175,11 @@ function noBeforeCurrentDate(req, res, next) {
 function closedTuesdays(req, res, next) {
   const {newReservation} = res.locals;//reservation date gotten
   const resDate = new Date(newReservation.reservation_date)
-  const dayOfWeek = resDate.getDay()
-  if (dayOfWeek === 1) {
+  const dayOfWeek = resDate.getUTCDay()
+    // if (dayOfWeek === 2) {
+    //closedDay = [2]
+    console.log("DAY OF WEEK", dayOfWeek)
+    if (closedDay.includes(dayOfWeek)) {
     return next({
       status: 400,
       message: "closed on Tuesdays, sorry for the inconvenience."
@@ -243,8 +248,8 @@ function validStatus(req, res, next) {
 }
 
 async function destroy(req, res, next) {
-  const bodyData = req.body
-  // console.log("REQUEST BODY", bodyData)
+  const bodyData = req.body.data
+  console.log("REQUEST BODY", bodyData)
   const updated = await service.update(bodyData)
   // console.log("updated: ", updated)
   res.status(202).json(updated)

@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
-import {Link} from "react-router-dom"
+import {Link, useHistory} from "react-router-dom"
 import { listReservations } from "../utils/api";
 import ErrorAlert from "../layout/ErrorAlert";
 import ReservationCard from "./ReservationCard";
+import TablesList from "../tables/TablesList";
 import { next, previous, today } from "../utils/date-time";
+import { API_BASE_URL } from "../utils/api";
 /**
  * Defines the dashboard page.
  * @param date
@@ -11,34 +13,37 @@ import { next, previous, today } from "../utils/date-time";
  * @returns {JSX.Element}
  */
 function Dashboard({ date }) {
+  const history = useHistory()
   //State variables
   const [reservations, setReservations] = useState([]);
   const [reservationsError, setReservationsError] = useState(null);
   const [dashDate, setDashDate] = useState(date);
   const [tables, setTables] = useState(null)
-  // console.log(tables)
-  useEffect(loadDashboard, [date]);
-  useEffect(()=> {
-    async function getTables() {
-      try {
-        const response = await fetch(
-        'https://restaurant-reservations-back-end-jl5i.onrender.com/tables',
-        {
-          method: "GET",
-          body: JSON.stringify(),
-          headers : {
-            "Content-type": "application/json;charset=UTF-8"
+
+  const [finishedRes, setFinishedRes] = useState()
+
+  console.log(tables)
+  useEffect(loadDashboard, [date, finishedRes]);
+  useEffect(loadTables, [date])
+  async function loadTables() {
+        try {
+          const response = await fetch(
+          `${API_BASE_URL}/tables`,
+          {
+            method: "GET",
+            body: JSON.stringify(),
+            headers : {
+              "Content-type": "application/json;charset=UTF-8"
+            }
           }
+        );
+        const tables = await response.json();
+        setTables(tables.data)
+        } catch (error) {
+          console.error("Error: ", error)
         }
-      );
-      const tables = await response.json();
-      setTables(tables)
-      } catch (error) {
-        console.error("Error: ", error)
-      }
-    }
-    getTables()
-  },[])
+  }
+
   /**
    * REMINDER TO SELF:
    * -----------------
@@ -55,40 +60,50 @@ function Dashboard({ date }) {
       .catch(setReservationsError);
     return () => abortController.abort();
   }
-
+  useEffect(async ()=>{
+    if (finishedRes) {
+    await fetch(
+      `${API_BASE_URL}/reservations/${finishedRes.reservation_id}/status`,
+      {
+        method: "PUT",
+        body: JSON.stringify({data: {...finishedRes, "status": "Finished"}}),
+        headers: {
+          "Content-type": "application/json;charset=UTF-8"
+        }
+      }
+    ).then(async (returned)=> {
+      const response = await returned.json()
+      console.log("DELETE: ", response)
+      loadDashboard()
+      loadTables()
+    })      
+    }
+}, [finishedRes])
   //Event Handlers
   const finishTable = async (e) => {
     e.preventDefault()
-    console.log("e.target.value", typeof e.target.value)
     const tableNum = Number(e.target.value)
     const finishedTable = tables.find((table)=> table.table_id === tableNum)
-    console.log(finishedTable)
-    console.log(reservations)
+
     const finishedReservation = reservations.find((res)=> res.reservation_id === finishedTable.reservation_id)
     if (window.confirm(`Is this table ready to seat new guests? This cannot be undone.`)) {
-      await fetch(
-        `https://restaurant-reservations-back-end-jl5i.onrender.com/tables/${tableNum}/seat`,
-        {
-          method: "DELETE",
-          body: JSON.stringify({data: finishedTable}),
-          headers: {
-            "Content-type": "application/json;charset=UTF-8"
+      setFinishedRes(finishedReservation)
+        await fetch(
+          `${API_BASE_URL}/tables/${tableNum}/seat`,
+          {
+            method: "DELETE",
+            body: JSON.stringify({data: {"status": "Free"}}),
+            headers: {
+              "Content-type": "application/json;charset=UTF-8"
+            }
           }
-        }
-      );
-      await fetch(
-        `https://restaurant-reservations-back-end-jl5i.onrender.com/reservations/${finishedReservation.reservation_id}/status`,
-        {
-          method: "PUT",
-          body: JSON.stringify({data: {...finishedReservation, "status": "Finished"}}),
-          headers: {
-            "Content-type": "application/json;charset=UTF-8"
-          }
-        }
-      )
-      window.location.reload(true)
+        ).then(async (returned)=> {
+        const response = await returned.json()
+        console.log("PUT: ", response)
+      })
     }
   }
+  console.log(reservations)
   return (
     <main>
       <h1>Dashboard</h1>
@@ -108,16 +123,13 @@ function Dashboard({ date }) {
       {!reservations ? <ErrorAlert error={reservationsError} /> : (
         <div>
           {reservations.map((reservation)=> {
-            console.log("RESERVATION DATE LIST", reservations)
-            if (dashDate === reservation.reservation_date) {
-              if (reservation.status === "Booked" || reservation.status === "Seated") {
+                // console.log("RESERVATION DATE LIST", reservation)  
+              if (reservation.status === "Booked" || reservation.status === "seated") {
+              
                 return <ReservationCard key={reservation.reservation_id} reservation={reservation}/> 
-              }
-                           
-            } else {
-              return ""
-            }
-            return ""
+              } else {
+                  return ""                
+              }             
           })}
         </div>
       )}

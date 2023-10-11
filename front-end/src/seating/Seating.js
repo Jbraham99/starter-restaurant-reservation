@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react"
 import { useHistory } from "react-router-dom/cjs/react-router-dom.min"
 import { useParams } from "react-router-dom/cjs/react-router-dom";
-
+import { API_BASE_URL } from "../utils/api";
 function Seating() {
     const { reservation_id } = useParams();//PARAMETER FROM URL
     const reservation_number = Number(reservation_id)
@@ -24,7 +24,7 @@ function Seating() {
     useEffect(()=>{
       async function getReservation(id){
         const response = await fetch(
-          `https://restaurant-reservations-back-end-jl5i.onrender.com/reservations/${id}/seat`,
+          `${API_BASE_URL}/reservations/${id}`,
           {
             method: "GET",
             headers: {
@@ -33,16 +33,17 @@ function Seating() {
           }
         );
         const reservation = await response.json();
+        // console.log("RESERVATION : ", reservation)
         setReservation(reservation.data)
       }
       getReservation(reservation_id)
     }, [reservation_id])
-    console.log(reservation)
+    // console.log(reservation)
     useEffect(()=> {
         async function getTables() {
           try {
             const response = await fetch(
-            'https://restaurant-reservations-back-end-jl5i.onrender.com/tables',
+            `${API_BASE_URL}/tables`,
             {
               method: "GET",
               body: JSON.stringify(),
@@ -51,14 +52,15 @@ function Seating() {
               }
             }
           );
-          const tables = await response.json();
-          setTables(tables)
+          const tables = await response.json()
+          // console.log("SEAT TABLES", tables.data)
+          setTables(tables.data)
           } catch (error) {
             console.error("Error: ", error)
           }
         }
         getTables()
-      },[])
+      }, [])
     /**
      * every time you change the option in the select element
      * use FIND method to find table based on the option table_id
@@ -74,7 +76,7 @@ function Seating() {
           "reservation_id": reservation_number
         })
     }
-    console.log("STATE VAR TABLE: ", table)
+    // console.log("STATE VAR TABLE: ", table)
     /**
      * after table saved in a state variable,
      * change 'status' to "Occupied"
@@ -84,28 +86,27 @@ function Seating() {
      */
     const submitHandler = async (e) => {
         e.preventDefault();
-        console.log(table)
+        // console.log(table)
         const response = await fetch(
-          `https://restaurant-reservations-back-end-jl5i.onrender.com/tables/${table.table_id}/seat`,
+          `${API_BASE_URL}/tables/${table.table_id}/seat`,
           {
             method: "PUT",
-            body: JSON.stringify(table),
+            body: JSON.stringify({data: table}),
             headers: {
               "Content-type": "application/json;charset=UTF-8"
             }
           }
         ); const savedData = await response.json();
-        console.log("Saved table! ", savedData)
+        // console.log("Saved table! ", savedData)
         history.push("/dashboard")
     }
     /**
      * HAVE THE VALUE BE THE TABLE ID
      * THEN MAKE A PUT REQUEST TO A TABLE BASED ON ID
      */
-    return <form onSubmit={submitHandler}>
+    return <div>{tables ? <form onSubmit={submitHandler}>
         <h3>Select a table:</h3>
-        <select name="table_id" onChange={changeHandler} required>
-            <option selected="true" disabled="disabled">Select a table</option>
+        <select name="table_id"  onChange={changeHandler} required>
             {tables && reservation? <>
             {tables.map((table)=>{
               if (table.status === "Free") {
@@ -117,7 +118,7 @@ function Seating() {
         </select>
         <button onClick={cancelHandler}>Cancel</button>
         <button type="submit">Submit</button>
-    </form>
+    </form> : <p>Loading...</p>}</div>
 }
 
 export default Seating

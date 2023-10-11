@@ -1,15 +1,15 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom/cjs/react-router-dom.min";
 import ReservationForm from "./reservationForm";
-
+import { API_BASE_URL } from "../utils/api";
 function ReservationEditForm({date}) {
     const {reservation_id} = useParams()
-    console.log(reservation_id)
+    // console.log(reservation_id)
     const [reservation, setReservation] = useState(null)
     useEffect(()=>{
         async function getReservation(id){
             const result = await fetch(
-                `https://restaurant-reservations-back-end-jl5i.onrender.com/reservations/${id}/edit`,
+                `${API_BASE_URL}/reservations/${id}/edit`,
                 {
                     method: "GET",
                     body: JSON.stringify(),
@@ -19,7 +19,7 @@ function ReservationEditForm({date}) {
                 }
             )
             const reservation = await result.json()
-            console.log("FETCHED: ", reservation.data)
+            // console.log("FETCHED: ", reservation.data)
             setReservation(reservation.data)
         }
         getReservation(reservation_id)

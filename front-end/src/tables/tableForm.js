@@ -1,5 +1,6 @@
 import { useState } from "react"
 import { useHistory } from "react-router-dom"
+import { API_BASE_URL } from "../utils/api";
 
 function TablesForm() {
     const history = useHistory();
@@ -10,6 +11,8 @@ function TablesForm() {
         "reservation_id": 0
     }
     const [table, setTable] = useState(initFormState)
+    const [error, setError] = useState(null)
+    const [formSubmitted, setFormSubmitted] = useState(false)
     const changeHandler = (e) => {
         setTable({
             ...table,
@@ -18,23 +21,34 @@ function TablesForm() {
     }
     const submitHandler = async (e) => {
         e.preventDefault()
-        await fetch(`https://restaurant-reservations-back-end-jl5i.onrender.com/tables`, {
-            method: 'POST',
-            headers: {"Content-Type": "application/json"},
-            body: JSON.stringify(table)
-        }).then(()=>{
-            console.log("Saved table: ", table)
-        })
-        history.push(`/dashboard`)
+        // console.log("sumbitted")
+            await fetch(`${API_BASE_URL}/tables`, {
+                method: 'POST',
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({data: {...table, "capacity": Number(table.capacity)}})
+            }).then(async (returned)=>{
+                const response = await returned.json()
+                if (response.error) {
+                    // console.log("Error response", response)
+                    setError(response.error)
+                    setFormSubmitted(true)
+                } else {
+                    // console.log("Saved table: ", response)
+                    history.push(`/dashboard`)                     
+                }
+            })
     }
-    return <form onSubmit={submitHandler}>
+    return <div>
+        <h1>Create a new table</h1>
+        {formSubmitted && error ? <div className="alert alert-danger">{error}</div> : ""}
+        <form onSubmit={submitHandler}>
         <label htmlFor="table_name">Table name</label>
-        <input type="text" id="table_name" name="table_name" value={table.table_name} onChange={changeHandler} required/>
+        <input type="text" id="table_name" name="table_name" value={table.table_name} onChange={changeHandler}/>
         <label htmlFor="capacity">Capacity</label>
-        <input type="text" id="capacity" name="capacity" value={table.capacity} onChange={changeHandler} required/>
-        <button className="btn btn-lg btn-dark">Cancel</button>
+        <input type="text" id="capacity" name="capacity" value={table.capacity} onChange={changeHandler}/>
+        <button className="btn btn-lg btn-dark" type="cancel" onClick={()=> history.goBack()}>Cancel</button>
         <button className="btn btn-lg btn-primary" type="submit">Submit</button>
-    </form>
+    </form></div>
 }
 
 export default TablesForm

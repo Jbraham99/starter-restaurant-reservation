@@ -36,7 +36,18 @@ function destroy(table) {
       "reservation_id": table.reservation_id
     })
     .update({
-      "status": table.status
+      "status": table.status,
+    })
+}
+
+function destroyTable(table) {
+  console.log("destroyTable", table)
+  return knex("tables")
+    .where({
+      "table_id": table.table_id
+    })
+    .update({
+      "status": table.status,
     })
 }
 
@@ -65,5 +76,6 @@ module.exports = {
     update,
     destroy,
     reservation,
-    updateReservation
+    updateReservation,
+    destroyTable
 }

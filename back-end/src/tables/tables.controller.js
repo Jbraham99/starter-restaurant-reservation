@@ -157,7 +157,7 @@ async function update(req, res) {
         "status": "seated"
     }
     const updatedReservation = await service.updateReservation(newReservation)
-    console.log("UPDATED RESERVATION: !!", newReservation)
+    // console.log("UPDATED RESERVATION: !!", newReservation)
     const newTable = {
         ...table,
         "reservation_id": reservation.reservation_id,
@@ -168,12 +168,10 @@ async function update(req, res) {
     res.status(200).json({data: newReservation})
 }
 
-async function destroy(req, res, next) { 
+async function destroy(req, res, next) {
+    console.log("TEST*&*&*&*&")
     const {table, reservation} = res.locals
     console.log("DESTROY: ", table, "RESREVATION: ", reservation)
-    /**
-     * update reservation status
-     */
     const newReservation = {
         // ...reservation,
         "reservation_id": table.reservation_id,
@@ -183,12 +181,17 @@ async function destroy(req, res, next) {
     console.log("UPDATE RESERVATION: ", updatedReservation)
     const finishedTable = {
         ...table,
-        "reservation_id": null,
         "status": "Free"
     }
     console.log("FINISHED TABLE!!", finishedTable)
-    const deletingTable = await service.destroy(finishedTable)
-    res.status(200).json({data: updatedReservation})
+    const deletingTable = await service.destroyTable(finishedTable)
+    console.log("FINISHED TABLE", finishedTable)
+    res.status(200).json({data: [updatedReservation, finishedTable]})
+}
+
+function testing(req, res, next) {
+    console.log("*****TEST MIDDLEWARE*****")
+    next()
 }
 
 module.exports = {

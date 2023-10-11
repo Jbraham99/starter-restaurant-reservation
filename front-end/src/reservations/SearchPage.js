@@ -1,6 +1,6 @@
 import ReservationCard from "../dashboard/ReservationCard"
 import React, {useState} from "react"
-import {Link} from "react-router-dom"
+import { API_BASE_URL } from "../utils/api"
 /**
  * make a GET request with a query using phone number
  * 
@@ -22,9 +22,9 @@ function SearchPage() {
     const searchHandler = async (e) => {
         e.preventDefault()
         setClicked(true)
-        console.log(form)
+        // console.log(form)
         const response = await fetch(
-            `https://restaurant-reservations-back-end-jl5i.onrender.com/reservations?mobile_number=${form.mobile_number}`,
+            `${API_BASE_URL}/reservations?mobile_number=${form.mobile_number}`,
             {
                 method: 'GET',
                 headers: {
@@ -35,7 +35,7 @@ function SearchPage() {
         const reservation = await response.json();
         setReservations(reservation)
     }
-    console.log(reservations)
+    // console.log(reservations)
     return (
         <div>
             <div>
