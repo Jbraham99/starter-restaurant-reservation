@@ -1,6 +1,5 @@
 const service = require("./tables.service")
 const asyncErrorBoundary = require("../errors/asyncErrorBoundary")
-const reservationController = require("../reservations/reservations.controller")
 
 async function list(req, res, next) {
     const tables = await service.list();
@@ -201,17 +200,17 @@ module.exports = {
         dataPropertyHas("capacity"),
         validTableName,
         validTableCapacity,
-        create
+        asyncErrorBoundary(create)
     ],
     update: [
-        tableExists,
-        tableCap,
+        asyncErrorBoundary(tableExists),
+        asyncErrorBoundary(tableCap),
         occupiedOrFree,
-        update
+        asyncErrorBoundary(update)
     ],
     delete: [
-        tableExists,
+        asyncErrorBoundary(tableExists),
         tableNotOccupied,
-        destroy
+        asyncErrorBoundary(destroy)
     ]
 }
