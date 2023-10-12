@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from "react";
-import {Link, useHistory} from "react-router-dom"
+import {Link} from "react-router-dom"
 import { listReservations } from "../utils/api";
 import ErrorAlert from "../layout/ErrorAlert";
 import ReservationCard from "./ReservationCard";
-import TablesList from "../tables/TablesList";
 import { next, previous, today } from "../utils/date-time";
 import { API_BASE_URL } from "../utils/api";
 /**
@@ -13,7 +12,6 @@ import { API_BASE_URL } from "../utils/api";
  * @returns {JSX.Element}
  */
 function Dashboard({ date }) {
-  const history = useHistory()
   //State variables
   const [reservations, setReservations] = useState([]);
   const [reservationsError, setReservationsError] = useState(null);
@@ -21,9 +19,14 @@ function Dashboard({ date }) {
   const [tables, setTables] = useState(null)
 
   const [finishedRes, setFinishedRes] = useState()
-
+  useEffect(()=> {
+    console.log("USE EFFECT TABLES ", tables)
+  }, [tables])
+  useEffect(()=>{
+    console.log("USE EFFECT RESERVATIONS ", reservations)
+  }, [reservations])
   console.log(tables)
-  useEffect(loadDashboard, [date, finishedRes]);
+  useEffect(loadDashboard, [date]);
   useEffect(loadTables, [date])
   async function loadTables() {
         try {
@@ -92,7 +95,7 @@ function Dashboard({ date }) {
           `${API_BASE_URL}/tables/${tableNum}/seat`,
           {
             method: "DELETE",
-            body: JSON.stringify({data: {"status": "Free"}}),
+            body: JSON.stringify({data: {"reservation_id": null}}),
             headers: {
               "Content-type": "application/json;charset=UTF-8"
             }
@@ -124,9 +127,9 @@ function Dashboard({ date }) {
         <div>
           {reservations.map((reservation)=> {
                 // console.log("RESERVATION DATE LIST", reservation)  
-              if (reservation.status === "Booked" || reservation.status === "seated") {
+              if (reservation.status === "Booked" || reservation.status === "Seated") {
               
-                return <ReservationCard key={reservation.reservation_id} reservation={reservation}/> 
+                return <ReservationCard key={reservation.reservation_id} loadDashboard={loadDashboard} reservation={reservation}/> 
               } else {
                   return ""                
               }             
@@ -135,12 +138,12 @@ function Dashboard({ date }) {
       )}
       <h3>Tables</h3>
       {tables ? <>
-      {tables.map(({table_name, capacity, table_id, status})=>{
+      {tables.map(({table_name, capacity, table_id, status, reservation_id})=>{
         return <div className="bg-secondary w-25 p-3" key={table_id}>
           <h6>{`${table_name}`}</h6>
-          <h4 data-table-id-status={table_id}>{`status: ${status}`}</h4>
+          {reservation_id ? <h4 data-table-id-status={`${table_id}`}>occupied</h4> : <h4 data-table-id-status={`${table_id}`}>free</h4>}
           <p>{`Capacity: ${capacity}`}</p>
-          {status === "Occupied" ? <button data-table-id-finish={table_id} value={table_id} onClick={finishTable}>Finish</button> : ""}
+          {reservation_id ? <button data-table-id-finish={table_id} value={table_id} onClick={finishTable}>Finish</button> : ""}
         </div>
       })}
       </> : <p>Loading...</p>}

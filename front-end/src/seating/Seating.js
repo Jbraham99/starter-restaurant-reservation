@@ -8,19 +8,15 @@ function Seating() {
     const [tables, setTables] = useState(null)
     const [table, setTable] = useState(null)
     const [reservation, setReservation] = useState(null)
-    const initFormState = {
-        "table_name": "",
-        "capacity": "",
-        "status": "Occupied",
-        "reservation_id": reservation_number
-    }    
-    const [form, setForm] = useState(initFormState)
-
+    const [err, setErr] = useState(null)
     const history = useHistory();
     const cancelHandler = (e) => {
         e.preventDefault()
         history.goBack()
     }
+    useEffect(()=>{
+      console.log("USE EFFECT TABLES: ", tables)
+    }, [tables])
     useEffect(()=>{
       async function getReservation(id){
         const response = await fetch(
@@ -72,7 +68,6 @@ function Seating() {
         const table = tables.find((table)=> table.table_id === tableNum)
         setTable({
           ...table,
-          "status": "Occupied",
           "reservation_id": reservation_number
         })
     }
@@ -86,19 +81,28 @@ function Seating() {
      */
     const submitHandler = async (e) => {
         e.preventDefault();
-        // console.log(table)
-        const response = await fetch(
-          `${API_BASE_URL}/tables/${table.table_id}/seat`,
-          {
-            method: "PUT",
-            body: JSON.stringify({data: table}),
-            headers: {
-              "Content-type": "application/json;charset=UTF-8"
+        if (table.capacity >= reservation.people) {
+          await fetch(
+            `${API_BASE_URL}/tables/${table.table_id}/seat`,
+            {
+              method: "PUT",
+              body: JSON.stringify({data: table}),
+              headers: {
+                "Content-type": "application/json;charset=UTF-8"
+              }
             }
-          }
-        ); const savedData = await response.json();
-        // console.log("Saved table! ", savedData)
-        history.push("/dashboard")
+          );
+          await fetch(`${API_BASE_URL}/reservations/${reservation_id}/status`, {
+            method: "DELETE",
+            body: JSON.stringify({data: { ...reservation, status: "Seated" }}),
+            headers: {
+              "Content-type": "application/json;charset=UTF-8",
+            },
+          })
+          history.push("/dashboard")          
+        } else {
+          setErr("This table can't fit that many people.")
+        }
     }
     /**
      * HAVE THE VALUE BE THE TABLE ID
@@ -106,13 +110,16 @@ function Seating() {
      */
     return <div>{tables ? <form onSubmit={submitHandler}>
         <h3>Select a table:</h3>
+        {err? <div className="alert alert-danger">{err}</div> : ""}
         <select name="table_id"  onChange={changeHandler} required>
+          <option>select:</option>
             {tables && reservation? <>
             {tables.map((table)=>{
-              if (table.status === "Free") {
-                if (table.capacity >= reservation.people)
+              if (!table.reservation_id) {
+                // if (table.capacity >= reservation.people)
                 return <option key={table.table_id} value={table.table_id} name={table.capacity}>{`${table.table_name} - ${table.capacity} guest(s)`}</option>                
               }
+              return ""
             })}
             </> : <option>Loading...</option>}
         </select>

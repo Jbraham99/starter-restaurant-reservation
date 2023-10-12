@@ -7,8 +7,8 @@ function TablesForm() {
     const initFormState = {
         "table_name": "",
         "capacity": "",
-        "status": "Free",
-        "reservation_id": 0
+        "status": "free",
+        "reservation_id": null
     }
     const [table, setTable] = useState(initFormState)
     const [error, setError] = useState(null)
@@ -46,7 +46,7 @@ function TablesForm() {
         <input type="text" id="table_name" name="table_name" value={table.table_name} onChange={changeHandler}/>
         <label htmlFor="capacity">Capacity</label>
         <input type="text" id="capacity" name="capacity" value={table.capacity} onChange={changeHandler}/>
-        <button className="btn btn-lg btn-dark" type="cancel" onClick={()=> history.goBack()}>Cancel</button>
+        <button className="btn btn-lg btn-dark" type="button" onClick={()=> history.goBack()}>Cancel</button>
         <button className="btn btn-lg btn-primary" type="submit">Submit</button>
     </form></div>
 }

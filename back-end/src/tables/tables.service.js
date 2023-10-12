@@ -23,11 +23,12 @@ function read(tableId) {
 
 function update(newTable) {
   return knex("tables")
-    .select("*")
     .where({
       "table_id": newTable.table_id
     })
-    .update(newTable, "*")
+    .update({
+      "reservation_id": Number(newTable.reservation_id)
+    })
 }
 
 function destroy(table) {
@@ -47,7 +48,7 @@ function destroyTable(table) {
       "table_id": table.table_id
     })
     .update({
-      "status": table.status,
+      "reservation_id": table.reservation_id
     })
 }
 

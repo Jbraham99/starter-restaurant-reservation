@@ -54,6 +54,7 @@ function validTableCapacity(req, res, next) {
 
 async function create(req, res) {
     const {newTable} = res.locals
+    console.log("%%%%", req.body.data)
     const table = await service.create(newTable)
     res.status(201).json({data: newTable})
 }
@@ -93,6 +94,7 @@ async function tableCap(req, res, next) {
         })
     }
     const resNum = Number(resData.reservation_id)
+    console.log("resNum: ", resNum)
     const reservation = await service.reservation(resNum)
     if (!reservation) {
         return next({
@@ -128,8 +130,8 @@ async function tableCap(req, res, next) {
 //check if table is occupied or not
 function occupiedOrFree(req, res, next) {
     const { table } = res.locals
-    // console.log("table status: ", table)
-    if (table.status === "Occupied") {
+    console.log("table status: ", table)
+    if (table.reservation_id) {
         return next({
             status: 400,
             message: `This table is occupied`
@@ -141,7 +143,8 @@ function occupiedOrFree(req, res, next) {
 //function when deleting to check if the table is NOT occupied
 function tableNotOccupied(req, res, next) {
     const {table} = res.locals;
-    if (table.status === "Occupied") {
+    console.log("TABLE NOT OCCUPIED", table)
+    if (table.reservation_id) {
         return next()
     }
     next({
@@ -160,10 +163,10 @@ async function update(req, res) {
     // console.log("UPDATED RESERVATION: !!", newReservation)
     const newTable = {
         ...table,
-        "reservation_id": reservation.reservation_id,
-        "status": "Occupied"
+        "reservation_id": Number(reservation.reservation_id),
+        "status": "occupied"
     }
-    // console.log(newTable)
+    console.log("TABLE DATA: ", newTable)
     const changedTable = await service.update(newTable)
     res.status(200).json({data: newReservation})
 }
@@ -181,7 +184,7 @@ async function destroy(req, res, next) {
     console.log("UPDATE RESERVATION: ", updatedReservation)
     const finishedTable = {
         ...table,
-        "status": "Free"
+        "reservation_id": null
     }
     console.log("FINISHED TABLE!!", finishedTable)
     const deletingTable = await service.destroyTable(finishedTable)

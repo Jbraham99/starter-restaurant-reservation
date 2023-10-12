@@ -205,9 +205,10 @@ function checkReservationStatus(req, res, next) {
 
 async function create(req, res, next) {
   const newReservation = req.body.data
-  // console.log("NEW RESERVATION: ", newReservation)
+  console.log("RESERVATION DATA: ", newReservation)
   const reservation = await service.create(newReservation)
-  res.status(201).json({data: newReservation})
+  console.log("NEW RESERVATION*:", reservation)
+  res.status(201).json({data: reservation})
 }
 
 async function reservationExists(req, res, next) {

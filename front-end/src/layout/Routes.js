@@ -21,7 +21,6 @@ import ReservationEditForm from "../reservations/ReservationEditForm";
 function Routes() {
   const query = useQuery();
   const date = query.get("date")
-  const mobile_number = query.get("mobile_number")
   // console.log("DATE FROM QUERY: ", date)
   return (
     <Switch>

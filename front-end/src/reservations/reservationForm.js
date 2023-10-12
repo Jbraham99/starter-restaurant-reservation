@@ -2,16 +2,6 @@ import React, { useState } from "react";
 import {Link, useHistory} from "react-router-dom"
 import { API_BASE_URL } from "../utils/api";
 
-//helper functions
-const dateCompare = (reservationDate, currentDate) => {
-  const res = new Date(reservationDate);
-  const curr = new Date(currentDate);
-  if (res < curr) {
-      return true
-  }
-  return false
-}
-
 function ReservationForm({date, reservation}) {
     // console.log("@@@@@", reservation)
     const history = useHistory()
@@ -70,7 +60,6 @@ function ReservationForm({date, reservation}) {
             })
         }
     }
-    const dayOfWeek = new Date(form.reservation_date).getDay()
     return <div>
         {formSubmitted && error ? <div className="alert alert-danger">{error}</div> : ""}
         {!reservation ? <form onSubmit={submitHandler}>
