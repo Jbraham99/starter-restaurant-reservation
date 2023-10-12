@@ -198,23 +198,23 @@ function testing(req, res, next) {
 }
 
 module.exports = {
-    list: asyncErrorBoundary(list),
+    list: [asyncErrorBoundary(list)],
     create: [
         dataPropertyHas("table_name"),
         dataPropertyHas("capacity"),
         validTableName,
         validTableCapacity,
-        create
+        asyncErrorBoundary(create)
     ],
     update: [
-        tableExists,
-        tableCap,
+        asyncErrorBoundary(tableExists),
+        asyncErrorBoundary(tableCap),
         occupiedOrFree,
-        update
+        asyncErrorBoundary(update)
     ],
     delete: [
-        tableExists,
+        asyncErrorBoundary(tableExists),
         tableNotOccupied,
-        destroy
+        asyncErrorBoundary(destroy)
     ]
 }

@@ -67,3 +67,34 @@ export async function listReservations(params, signal) {
     .then(formatReservationDate)
     .then(formatReservationTime);
 }
+
+export async function finishTable(table_id, reservation_id) {
+  const url = `${API_BASE_URL}/tables/${table_id}/seat`;
+  const options = {
+    method: "DELETE",
+    headers,
+  };
+  return await fetchJson(url, options, {});
+}
+export async function loadTables(signal) {
+  const url = `${API_BASE_URL}/tables`;
+  return await fetchJson(url, { headers, signal }, []);
+}
+// export async function loadTables() {
+//   try {
+//     const response = await fetch(
+//     `${API_BASE_URL}/tables`,
+//     {
+//       method: "GET",
+//       body: JSON.stringify(),
+//       headers : {
+//         "Content-type": "application/json;charset=UTF-8"
+//       }
+//     }
+//   );
+//   const tables = await response.json();
+//   setTables(tables.data)
+//   } catch (error) {
+//     console.error("Error: ", error)
+//   }
+// }

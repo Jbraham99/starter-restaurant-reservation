@@ -3,6 +3,7 @@
  */
 const { first } = require("../db/connection")
 const service = require("./reservations.service")
+const asyncErrorBoundary = require("../errors/asyncErrorBoundary")
 
 const closedDay = [2]
 
@@ -375,34 +376,34 @@ async function edit(req, res, next) {
 }
 
 module.exports = {
-  list,
+  list: [asyncErrorBoundary(list)],
   create: [
     ValidReservation,
     checkReservationStatus,
     noBeforeCurrentDate,
     closedTuesdays,
     opperationHours,
-    create
+    asyncErrorBoundary(create)
   ],
   read: [
-    reservationExists,
+    asyncErrorBoundary(reservationExists),
     read
   ],
   update: [
-    reservationExists,
+    asyncErrorBoundary(reservationExists),
     ifFinished,
     validStatus,
-    update
+    asyncErrorBoundary(update)
   ],
   delete: [
-    reservationExists,
+    asyncErrorBoundary(reservationExists),
     ifFinished,
-    destroy
+    asyncErrorBoundary(destroy)
   ],
   edit: [
-    reservationExists,
+    asyncErrorBoundary(reservationExists),
     ifFinished,
     validChanges,
-    edit
+    asyncErrorBoundary(edit)
   ]
 };

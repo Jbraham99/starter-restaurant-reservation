@@ -64,7 +64,7 @@ function ReservationCard({ reservation, loadDashboard }) {
       <h5>
         {reservation_date} @ {reservation_time}
       </h5>
-      <h6 data-reservation-id-status={reservation.reservation_id}>{status}</h6>
+      <h6 data-reservation-id-status={reservation.reservation_id}>{status.toLowerCase()}</h6>
       <p>Ph#: {mobile_number}</p>
       <a href={`/reservations/${reservation_id}/edit`}>
         <button >Edit</button>        

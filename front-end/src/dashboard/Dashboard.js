@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 import {Link} from "react-router-dom"
-import { listReservations } from "../utils/api";
+import { listReservations, finishTable, API_BASE_URL, loadTables } from "../utils/api";
 import ErrorAlert from "../layout/ErrorAlert";
 import ReservationCard from "./ReservationCard";
 import { next, previous, today } from "../utils/date-time";
-import { API_BASE_URL } from "../utils/api";
+import TablesList from "../tables/TablesList"
 /**
  * Defines the dashboard page.
  * @param date
@@ -17,35 +17,18 @@ function Dashboard({ date }) {
   const [reservationsError, setReservationsError] = useState(null);
   const [dashDate, setDashDate] = useState(date);
   const [tables, setTables] = useState(null)
+  const [tablesError, setTablesError] = useState(null);
 
   const [finishedRes, setFinishedRes] = useState()
-  useEffect(()=> {
-    console.log("USE EFFECT TABLES ", tables)
-  }, [tables])
-  useEffect(()=>{
-    console.log("USE EFFECT RESERVATIONS ", reservations)
-  }, [reservations])
+  // useEffect(()=> {
+  //   console.log("USE EFFECT TABLES ", tables)
+  // }, [tables])
+  // useEffect(()=>{
+  //   console.log("USE EFFECT RESERVATIONS ", reservations)
+  // }, [reservations])
   console.log(tables)
   useEffect(loadDashboard, [date]);
-  useEffect(loadTables, [date])
-  async function loadTables() {
-        try {
-          const response = await fetch(
-          `${API_BASE_URL}/tables`,
-          {
-            method: "GET",
-            body: JSON.stringify(),
-            headers : {
-              "Content-type": "application/json;charset=UTF-8"
-            }
-          }
-        );
-        const tables = await response.json();
-        setTables(tables.data)
-        } catch (error) {
-          console.error("Error: ", error)
-        }
-  }
+  // useEffect(loadTables, [])
 
   /**
    * REMINDER TO SELF:
@@ -60,9 +43,11 @@ function Dashboard({ date }) {
     setReservationsError(null);
     listReservations({ date }, abortController.signal)
       .then((data)=> setReservations(data))
-      .catch(setReservationsError);
+      .catch(setReservationsError)
+    loadTables(abortController.signal).then(setTables).catch(setTablesError);
     return () => abortController.abort();
   }
+
   useEffect(async ()=>{
     if (finishedRes) {
     await fetch(
@@ -106,6 +91,11 @@ function Dashboard({ date }) {
       })
     }
   }
+  function onFinish(table_id, reservation_id) {
+    finishTable(table_id, reservation_id)
+      .then(loadDashboard)
+      .catch(setTablesError);
+  }
   console.log(reservations)
   return (
     <main>
@@ -132,18 +122,22 @@ function Dashboard({ date }) {
                 return <ReservationCard key={reservation.reservation_id} loadDashboard={loadDashboard} reservation={reservation}/> 
               } else {
                   return ""                
-              }             
+              }
           })}
         </div>
       )}
       <h3>Tables</h3>
       {tables ? <>
-      {tables.map(({table_name, capacity, table_id, status, reservation_id})=>{
-        return <div className="bg-secondary w-25 p-3" key={table_id}>
-          <h6>{`${table_name}`}</h6>
-          {reservation_id ? <h4 data-table-id-status={`${table_id}`}>occupied</h4> : <h4 data-table-id-status={`${table_id}`}>free</h4>}
-          <p>{`Capacity: ${capacity}`}</p>
-          {reservation_id ? <button data-table-id-finish={table_id} value={table_id} onClick={finishTable}>Finish</button> : ""}
+        {/* <div className="col-md-6 col-lg-6 col-sm-12">
+          <ErrorAlert error={tablesError} />
+          <TablesList onFinish={onFinish} tables={tables} />
+        </div> */}
+      {tables.map((table)=>{
+        return <div className="bg-secondary w-25 p-3" key={table.table_id}>
+          <h6>{`${table.table_name}`}</h6>
+          {table.reservation_id ? <h4 data-table-id-status={`${table.table_id}`}>occupied</h4> : <h4 data-table-id-status={`${table.table_id}`}>free</h4>}
+          <p>{`Capacity: ${table.capacity}`}</p>
+          {table.reservation_id ? <button data-table-id-finish={table.table_id} data-reservation-id-finish={table.reservation_id} value={table.table_id} onClick={finishTable}>Finish</button> : ""}
         </div>
       })}
       </> : <p>Loading...</p>}

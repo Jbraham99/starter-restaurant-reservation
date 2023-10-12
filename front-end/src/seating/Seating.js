@@ -3,19 +3,24 @@ import { useHistory } from "react-router-dom/cjs/react-router-dom.min"
 import { useParams } from "react-router-dom/cjs/react-router-dom";
 import { API_BASE_URL } from "../utils/api";
 function Seating() {
+    const [selectedTable, setSelectedTable] = useState('')
     const { reservation_id } = useParams();//PARAMETER FROM URL
     const reservation_number = Number(reservation_id)
     const [tables, setTables] = useState(null)
     const [table, setTable] = useState(null)
     const [reservation, setReservation] = useState(null)
     const [err, setErr] = useState(null)
+    const [changeCount, setChangeCount] = useState(0)
     const history = useHistory();
     const cancelHandler = (e) => {
         e.preventDefault()
         history.goBack()
     }
-    useEffect(()=>{
+    useEffect(async ()=>{
+      if (tables !== null) {
       console.log("USE EFFECT TABLES: ", tables)
+      setSelectedTable(tables[0])
+      }
     }, [tables])
     useEffect(()=>{
       async function getReservation(id){
@@ -51,6 +56,7 @@ function Seating() {
           const tables = await response.json()
           // console.log("SEAT TABLES", tables.data)
           setTables(tables.data)
+          setSelectedTable(tables.data[0])
           } catch (error) {
             console.error("Error: ", error)
           }
@@ -64,9 +70,14 @@ function Seating() {
      */
     const changeHandler = (e) => {
         e.preventDefault();
+        setChangeCount(changeCount + 1)
         const tableNum = Number(e.target.value)
         const table = tables.find((table)=> table.table_id === tableNum)
         setTable({
+          ...table,
+          "reservation_id": reservation_number
+        })
+        setSelectedTable({
           ...table,
           "reservation_id": reservation_number
         })
@@ -81,12 +92,12 @@ function Seating() {
      */
     const submitHandler = async (e) => {
         e.preventDefault();
-        if (table.capacity >= reservation.people) {
+        if (selectedTable.capacity >= reservation.people) {
           await fetch(
-            `${API_BASE_URL}/tables/${table.table_id}/seat`,
+            `${API_BASE_URL}/tables/${selectedTable.table_id}/seat`,
             {
               method: "PUT",
-              body: JSON.stringify({data: table}),
+              body: JSON.stringify({data: {...table, "reservation_id": Number(reservation_id)}}),
               headers: {
                 "Content-type": "application/json;charset=UTF-8"
               }
@@ -104,6 +115,7 @@ function Seating() {
           setErr("This table can't fit that many people.")
         }
     }
+    console.log(selectedTable)
     /**
      * HAVE THE VALUE BE THE TABLE ID
      * THEN MAKE A PUT REQUEST TO A TABLE BASED ON ID
@@ -111,13 +123,13 @@ function Seating() {
     return <div>{tables ? <form onSubmit={submitHandler}>
         <h3>Select a table:</h3>
         {err? <div className="alert alert-danger">{err}</div> : ""}
-        <select name="table_id"  onChange={changeHandler} required>
-          <option>select:</option>
+        <select name="table_id"  value={`${selectedTable}`} onChange={changeHandler}>
+          {/* <option value{}>select:</option> */}
             {tables && reservation? <>
             {tables.map((table)=>{
               if (!table.reservation_id) {
                 // if (table.capacity >= reservation.people)
-                return <option key={table.table_id} value={table.table_id} name={table.capacity}>{`${table.table_name} - ${table.capacity} guest(s)`}</option>                
+                return <option key={table.table_id} value={table.table_id} name={table.capacity}>{`${table.table_name} - ${table.capacity}`}</option>                
               }
               return ""
             })}
