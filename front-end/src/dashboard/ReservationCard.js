@@ -77,7 +77,7 @@ function ReservationCard({ reservation, loadDashboard }) {
         
           <button ><a href={`/reservations/${reservation_id}/edit`}>Edit</a></button>        
         
-        {status.toLowerCase() == "booked" ? 
+        {status.toLowerCase() === "booked" ? 
           <a href={`/reservations/${reservation_id}/seat`}>
             <button onClick={updateReservation} value={reservation_id}>Seat</button>
             </a>: ""}

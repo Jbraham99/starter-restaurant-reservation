@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 import {Link} from "react-router-dom"
-import { listReservations, finishTable, API_BASE_URL, loadTables } from "../utils/api";
+import { listReservations, API_BASE_URL, loadTables } from "../utils/api";
 import ErrorAlert from "../layout/ErrorAlert";
 import ReservationCard from "./ReservationCard";
 import { next, previous, today } from "../utils/date-time";
-import TablesList from "../tables/TablesList"
+// import TablesList from "../tables/TablesList"
 /**
  * Defines the dashboard page.
  * @param date
@@ -17,9 +17,9 @@ function Dashboard({ date }) {
   const [reservationsError, setReservationsError] = useState(null);
   const [dashDate, setDashDate] = useState(date);
   const [tables, setTables] = useState(null)
-  const [tablesError, setTablesError] = useState(null);
+  // const [tablesError, setTablesError] = useState(null);
 
-  const [finishedRes, setFinishedRes] = useState()
+  const [finishedRes, setFinishedRes] = useState(null)
   // useEffect(()=> {
   //   console.log("USE EFFECT TABLES ", tables)
   // }, [tables])
@@ -44,29 +44,32 @@ function Dashboard({ date }) {
     listReservations({ date }, abortController.signal)
       .then((data)=> setReservations(data))
       .catch(setReservationsError)
-    loadTables(abortController.signal).then(setTables).catch(setTablesError);
+    loadTables(abortController.signal).then(setTables);
     return () => abortController.abort();
   }
 
-  useEffect(async ()=>{
-    if (finishedRes) {
-    await fetch(
-      `${API_BASE_URL}/reservations/${finishedRes.reservation_id}/status`,
-      {
-        method: "PUT",
-        body: JSON.stringify({data: {...finishedRes, "status": "Finished"}}),
-        headers: {
-          "Content-type": "application/json;charset=UTF-8"
+  useEffect(()=>{
+    async function reservationStatus(){
+      if (finishedRes) {
+      await fetch(
+        `${API_BASE_URL}/reservations/${finishedRes.reservation_id}/status`,
+        {
+          method: "PUT",
+          body: JSON.stringify({data: {...finishedRes, "status": "Finished"}}),
+          headers: {
+            "Content-type": "application/json;charset=UTF-8"
+          }
         }
+      ).then(async (returned)=> {
+        const response = await returned.json()
+        console.log("DELETE: ", response)
+        loadDashboard()
+        loadTables()
+      })
       }
-    ).then(async (returned)=> {
-      const response = await returned.json()
-      console.log("DELETE: ", response)
-      loadDashboard()
-      loadTables()
-    })      
     }
-}, [finishedRes])
+    reservationStatus()
+}, [finishedRes, ])
   //Event Handlers
   const finishTable = async (e) => {
     e.preventDefault()
@@ -92,11 +95,7 @@ function Dashboard({ date }) {
       })
     }
   }
-  function onFinish(table_id, reservation_id) {
-    finishTable(table_id, reservation_id)
-      .then(loadDashboard)
-      .catch(setTablesError);
-  }
+
   console.log(reservations)
   return (
     <main>

@@ -39,7 +39,7 @@ function ReservationForm({date, reservation}) {
             await fetch(`${API_BASE_URL}/reservations/${reservation.reservation_id}/edit`, {
                 method: 'PUT',
                 headers: {"Content-Type": "application/json"},
-                body: JSON.stringify({data: editFormData})
+                body: JSON.stringify({data: {...editFormData, "people": Number(editFormData.people)}})
             }).then(async (returned)=> {
                 const response = await returned.json()
                 console.log("response: ", response)

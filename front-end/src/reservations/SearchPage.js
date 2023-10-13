@@ -12,7 +12,7 @@ function SearchPage() {
     }
     const [reservations, setReservations] = useState([])
     const [form, setForm] = useState(initForm);
-    const [clicked, setClicked] = useState(false)
+    // const [clicked, setClicked] = useState(false)
     const [err, setErr] = useState(null)
     const changeHandler = (e) => {
         setErr(null)
@@ -24,7 +24,7 @@ function SearchPage() {
     console.log(form)
     const searchHandler = async (e) => {
         e.preventDefault()
-        setClicked(true)
+        // setClicked(true)
         // console.log(form)
             const response = await fetch(
                 `${API_BASE_URL}/reservations?mobile_number=${form.mobile_number}`,

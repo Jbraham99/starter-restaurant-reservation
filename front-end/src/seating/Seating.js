@@ -16,7 +16,7 @@ function Seating() {
         e.preventDefault()
         history.goBack()
     }
-    useEffect(async ()=>{
+    useEffect(()=>{
       if (tables !== null) {
       console.log("USE EFFECT TABLES: ", tables)
       setSelectedTable(tables[0])
