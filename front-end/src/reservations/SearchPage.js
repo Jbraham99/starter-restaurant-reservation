@@ -37,8 +37,8 @@ function SearchPage() {
             );
             const reservations = await response.json();
             console.log(";;;;;;;", reservations)
-            if (reservations.error) {
-                setErr(reservations.error)
+            if (reservations.data.length === 0) {
+                setErr("No reservations found")
             } else {
                 setReservations(reservations.data)
             }
@@ -48,7 +48,7 @@ function SearchPage() {
         <div>
             <div>
             <label htmlFor="mobile_number"><h2>Search reservation by phone number!</h2></label>
-            {err? <div className="alert alert-danger">{err}</div> : ""}
+            {err? <div className="alert alert-danger">No reservations found</div> : ""}
             <input type="text" name="mobile_number" id="mobile_number" placeholder="Enter customer's phone number" onChange={changeHandler} value={form.mobile_number} required/>
             <button onClick={searchHandler} value={form} type="submit">Find</button>
             </div>

@@ -94,7 +94,7 @@ async function tableCap(req, res, next) {
         })
     }
     const resNum = Number(resData.reservation_id)
-    // console.log("resNum: ", resNum)
+    console.log("***")
     const reservation = await service.reservation(resNum)
     if (!reservation) {
         return next({
@@ -166,35 +166,27 @@ async function update(req, res) {
         "reservation_id": Number(reservation.reservation_id),
         "status": "occupied"
     }
-    ("TABLE DATA: ", newTable)
+    // ("TABLE DATA: ", newTable)
     const changedTable = await service.update(newTable)
     res.status(200).json({data: newReservation})
 }
 
 async function destroy(req, res, next) {
-    ("TEST*&*&*&*&")
     const {table, reservation} = res.locals
-    ("DESTROY: ", table, "RESREVATION: ", reservation)
     const newReservation = {
         // ...reservation,
         "reservation_id": table.reservation_id,
         "status": "finished"
     }
     const updatedReservation = await service.updateReservation(newReservation)
-    ("UPDATE RESERVATION: ", updatedReservation)
     const finishedTable = {
         ...table,
         "reservation_id": null
     }
-    ("FINISHED TABLE!!", finishedTable)
+    // ("FINISHED TABLE!!", finishedTable)
     const deletingTable = await service.destroyTable(finishedTable)
-    ("FINISHED TABLE", finishedTable)
+    // ("FINISHED TABLE", finishedTable)
     res.status(200).json({data: [updatedReservation, finishedTable]})
-}
-
-function testing(req, res, next) {
-    ("*****TEST MIDDLEWARE*****")
-    next()
 }
 
 module.exports = {

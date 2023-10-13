@@ -102,7 +102,10 @@ function Seating() {
                 "Content-type": "application/json;charset=UTF-8"
               }
             }
-          );
+          ).then(async (returned)=>{
+            const response = await returned.json()
+            console.log("response: ", response)
+          });
           await fetch(`${API_BASE_URL}/reservations/${reservation_id}/status`, {
             method: "DELETE",
             body: JSON.stringify({data: { ...reservation, status: "seated" }}),

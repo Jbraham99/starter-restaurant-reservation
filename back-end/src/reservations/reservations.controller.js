@@ -66,13 +66,8 @@ async function list(req, res, next) {
   } else if (mobileNumber) {
     const reservations = await service.listByNum(mobileNumber)
     // console.log("MOBILE NUMBER QUERY: ", req.query)
-    if (reservations.length > 0) {
+    if (reservations) {
       return res.json({data: reservations})
-    } else {
-      return next({
-        status:400,
-        message: "No reservations found"
-      })
     }
   } else {
     const result = await service.list(getCurrentDate())
@@ -404,10 +399,8 @@ function validChanges(req, res, next) {
       message: "people missing or empty"
     })
   }
+  console.log("SANITY CHECK: ", typeof people)
   if (typeof people !== "number") {
-    if (Number(people) !== NaN) {
-      return next()
-    }
     return next({
       status: 400,
       message: "people must be a number"
@@ -418,10 +411,11 @@ function validChanges(req, res, next) {
 }
 
 async function edit(req, res, next) {
-  const bodyData = req.body.data
+  // const bodyData = req.body.data
+  const edittedReservation = req.body.data
   // console.log("res w/ edits: ", bodyData)
-  const update = await service.edit(bodyData)
-  res.status(200).json({data: bodyData})
+  const update = await service.edit(edittedReservation)
+  res.status(200).json({data: edittedReservation})
 }
 
 
