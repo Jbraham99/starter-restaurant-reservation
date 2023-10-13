@@ -115,20 +115,23 @@ function Dashboard({ date }) {
   }
   return (
     <main>
-      <h1>Dashboard</h1>
-      <div className="d-md-flex mb-3">
+      <h1 class="text-justify">Dashboard</h1>
+      <div className="d-md-flex mb-3 d-flex">
         <h4 className="mb-0">Reservations for {dashDate}</h4>
       </div>
-      <Link to={`/dashboard?date=${previous(dashDate)}`}>
-        <button onClick={()=> setDashDate(previous(dashDate))}>Previous</button>
-      </Link>
-      <Link to={`/dashboard`}>
-        <button onClick={()=> setDashDate(today())}>Today</button>
-      </Link>
+      <div className="btn-group d-flex justify-content-around mb-4">
+        <Link to={`/dashboard?date=${previous(dashDate)}`}>
+          <button type="button" class="btn btn-secondary" onClick={()=> setDashDate(previous(dashDate))}>Previous</button>
+        </Link>
+        <Link to={`/dashboard`}>
+          <button type="button" class="btn btn-secondary" onClick={()=> setDashDate(today())}>Today</button>
+        </Link>
+        
+        <Link to={`/dashboard?date=${next(dashDate)}`}>
+          <button type="button" class="btn btn-secondary" onClick={()=> setDashDate(next(dashDate))}>Next</button>
+        </Link>        
+      </div>
       
-      <Link to={`/dashboard?date=${next(dashDate)}`}>
-        <button onClick={()=> setDashDate(next(dashDate))}>Next</button>
-      </Link>
       {!reservations ? <ErrorAlert error={reservationsError} /> : (
         <div>
           {reservations.map((reservation)=> {
@@ -147,9 +150,9 @@ function Dashboard({ date }) {
           <TablesList onFinish={onFinish} tables={tables} />
         </div> */}
       {tables.length > 0 && tables.map((table)=>{
-        return <div className="bg-secondary w-25 p-3" key={table.table_id}>
+        return <div className="bg-light shadow p-3 mg-5 rounded m-4" key={table.table_id}>
           <h6>{`${table.table_name}`}</h6>
-          {table.reservation_id ? <p data-table-id-status={table.table_id}>occupied<button data-table-id-finish={table.table_id} data-reservation-id-finish={table.reservation_id} value={table.table_id} onClick={finishTable}>finish</button></p> : <p data-table-id-status={`${table.table_id}`}>free</p>}
+          {table.reservation_id ? <p data-table-id-status={table.table_id}>occupied<button data-table-id-finish={table.table_id} data-reservation-id-finish={table.reservation_id} value={table.table_id} onClick={finishTable} className="btn btn-lg btn-success">finish</button></p> : <p data-table-id-status={`${table.table_id}`}>free</p>}
           <p>{`Capacity: ${table.capacity}`}</p>
           {/* {table.reservation_id ?  : ""} */}
         </div>

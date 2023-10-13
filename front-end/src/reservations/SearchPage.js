@@ -59,8 +59,10 @@ function SearchPage() {
             <div>
             <label htmlFor="mobile_number"><h2>Search reservation by phone number!</h2></label>
             {err? <div className="alert alert-danger">No reservations found</div> : ""}
+            <div className="d-flex justify-content-around">
             <input type="text" name="mobile_number" id="mobile_number" placeholder="Enter customer's phone number" onChange={changeHandler} value={form.mobile_number} required/>
-            <button onClick={searchHandler} value={form} type="submit">Find</button>
+            <button onClick={searchHandler} value={form} type="submit" className="btn btn-lg btn-success">Find</button>
+            </div>
             </div>
             {reservations.length > 0 ? <div>{reservations.map((reservation)=>{
                 return <ReservationCard key={reservation.reservation_id} reservation={reservation}/>

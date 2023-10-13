@@ -91,37 +91,67 @@ function ReservationForm({date, reservation}) {
         }
     }
     return <div>
+        {!reservation ? <h4 className="mb-3">New Reservation</h4> : ""}
         {formSubmitted && error ? <div className="alert alert-danger">{error}</div> : ""}
         {!reservation ? <form onSubmit={submitHandler}>
+        <div className="d-flex justify-content-between mb-3">
         <label htmlFor="first_name" >First Name</label>
         <input type="text" name="first_name" id="first_name" value={form.first_name} onChange={changeHandler} required/>
+        </div>
+        <div className="d-flex justify-content-between mb-3">
         <label htmlFor="last_name">Last Name</label>
-        <input type="text" name="last_name" id="last_name" value={form.last_name} onChange={changeHandler} required/>
+        <input type="text" name="last_name" id="last_name" value={form.last_name} onChange={changeHandler} required/>            
+        </div>
+        <div className="d-flex justify-content-between mb-3">
         <label htmlFor="mobile_number">Mobile Number</label>
         <input type="text" name="mobile_number" id="mobile_number" value={form.mobile_number} onChange={changeHandler} maxLength={13} required/>
+        </div>
+        <div className="d-flex justify-content-between mb-3">
         <label htmlFor="reservation_date">Reservation Date</label>
         <input type="date" name="reservation_date" id="date" value={form.reservation_date} onChange={changeHandler} required/>
+        </div>
+        <div className="d-flex justify-content-between mb-3">
         <label htmlFor="reservation_time">Reservation Time</label>
-        <input type="time" name="reservation_time" id="time" value={form.reservation_time} onChange={changeHandler} required/>
+        <input type="time" name="reservation_time" id="time" value={form.reservation_time} onChange={changeHandler} required/>          
+        </div>
+        <div className="d-flex justify-content-between mb-3">
         <label htmlFor="people">People</label>
-        <input type="text" name="people" id="people" value={form.people} onChange={changeHandler} required/>
-        <Link to={"/dashboard"}><button>cancel</button></Link>
-        <button type="submit">Submit</button>
+        <input type="text" name="people" id="people" value={form.people} onChange={changeHandler} required/>       
+        </div>
+        <div className="d-flex justify-content-around">
+        <Link to={"/dashboard"}><button className="btn btn-lg btn-dark">cancel</button></Link>
+        <button className="btn btn-lg btn-dark" type="submit">Submit</button>            
+        </div>
+
     </form> : <form onSubmit={submitHandler}>
+        <div className="d-flex justify-content-between mb-3">
         <label htmlFor="first_name" >First Name</label>
         <input type="text" name="first_name" id="first_name"  value={editFormData.first_name} onChange={editFormHandler} required/>
+        </div>
+        <div className="d-flex justify-content-between mb-3">
         <label htmlFor="last_name">Last Name</label>
         <input type="text" name="last_name" id="last_name" value={editFormData.last_name} onChange={editFormHandler} required/>
+        </div>
+        <div className="d-flex justify-content-between mb-3">
         <label htmlFor="mobile_number">Mobile Number</label>
         <input type="text" name="mobile_number" id="mobile_number" value={editFormData.mobile_number} onChange={editFormHandler} maxLength={13} required/>
+        </div>
+        <div className="d-flex justify-content-between mb-3">
         <label htmlFor="reservation_date">Reservation Date</label>
         <input type="date" name="reservation_date" id="date" min={date} value={editFormData.reservation_date} onChange={editFormHandler} />
+        </div>
+        <div className="d-flex justify-content-between mb-3">
         <label htmlFor="reservation_time">Reservation Time</label>
         <input type="time" name="reservation_time" id="time" min="10:30" max="21:30" value={editFormData.reservation_time} onChange={editFormHandler} required/>
+        </div>
+        <div className="d-flex justify-content-between mb-3">
         <label htmlFor="people">People</label>
         <input type="text" name="people" id="people" value={editFormData.people} onChange={editFormHandler} required/>
-        <Link to={"/dashboard"}><button>cancel</button></Link>
-        <button type="submit">Submit</button>
+        </div>
+        <div className="d-flex justify-content-around">
+        <Link to={"/dashboard"}><button className="btn btn-lg btn-dark">cancel</button></Link>
+        <button type="submit" className="btn btn-lg btn-dark">Submit</button>
+        </div>
     </form>}
         </div>
 }
