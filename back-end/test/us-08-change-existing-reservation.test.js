@@ -342,12 +342,11 @@ describe("US-08 - Change an existing reservation", () => {
         reservation_time: "17:30",
         people: "2",
       };
-
       const response = await request(app)
         .put("/reservations/1")
         .set("Accept", "application/json")
-        .send({ data });
-
+        .send({ data })
+        
       expect(response.body.error).toContain("people");
       expect(response.status).toBe(400);
     });
