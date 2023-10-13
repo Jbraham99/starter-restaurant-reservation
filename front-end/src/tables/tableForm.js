@@ -21,22 +21,31 @@ function TablesForm() {
     }
     const submitHandler = async (e) => {
         e.preventDefault()
-        // console.log("sumbitted")
+        try {
+            const abortController = new AbortController()
             await fetch(`${API_BASE_URL}/tables`, {
                 method: 'POST',
                 headers: {"Content-Type": "application/json"},
-                body: JSON.stringify({data: {...table, "capacity": Number(table.capacity)}})
+                body: JSON.stringify({data: {...table, "capacity": Number(table.capacity)}}),
+                signal: abortController.signal
             }).then(async (returned)=>{
                 const response = await returned.json()
                 if (response.error) {
-                    // console.log("Error response", response)
+
                     setError(response.error)
                     setFormSubmitted(true)
                 } else {
-                    // console.log("Saved table: ", response)
                     history.push(`/dashboard`)                     
                 }
-            })
+            })            
+        } catch (error) {
+            if (error.name === "AbortError") {
+              console.log("Request was aborted.")
+            } else {
+              console.error("An error occurred: ", error)
+            }
+          }
+
     }
     return <div>
         <h1>Create a new table</h1>

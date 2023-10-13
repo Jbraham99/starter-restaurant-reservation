@@ -32,34 +32,62 @@ function ReservationForm({date, reservation}) {
     }
     const submitHandler = async (e) => {
         e.preventDefault()
-        console.log("^&^&^&", form)
-        const resDay = new Date(form.reservation_date).getUTCDay()
-        console.log("**", resDay)
+        // console.log("^&^&^&", form)
+        // const resDay = new Date(form.reservation_date).getUTCDay()
+        // console.log("**", resDay)
         if (reservation) {
-            await fetch(`${API_BASE_URL}/reservations/${reservation.reservation_id}/edit`, {
-                method: 'PUT',
-                headers: {"Content-Type": "application/json"},
-                body: JSON.stringify({data: {...editFormData, "people": Number(editFormData.people)}})
-            }).then(async (returned)=> {
-                const response = await returned.json()
-                console.log("response: ", response)
-            })
-            history.push(`/dashboard?date=${editFormData.reservation_date}`)
+            if (!isNaN(Number(editFormData.people))){
+                try {
+                    const abortController = new AbortController()
+                    await fetch(`${API_BASE_URL}/reservations/${reservation.reservation_id}/edit`, {
+                        method: 'PUT',
+                        headers: {"Content-Type": "application/json"},
+                        body: JSON.stringify({data: {...editFormData, "people": Number(editFormData.people)}}),
+                        signal: abortController.signal
+                    }).then(async (returned)=> {
+                        const response = await returned.json()
+                        if (response.error) {
+                            setFormSubmitted(true)
+                            setError(response.error)
+                        }
+                    })
+                    history.push(`/dashboard?date=${editFormData.reservation_date}`)                
+                }  catch (error) {
+                    if (error.name === "AbortError") {
+                    // console.log("Request was aborted.")
+                    } else {
+                    console.error("An error occurred: ", error)
+                    }
+                }                
+            } else {
+                setFormSubmitted(true)
+                setError("people must be a number")
+            }
         } else {
-            await fetch(`${API_BASE_URL}/reservations`, {
-                method: 'POST',
-                headers: {"Content-Type": "application/json"},
-                body: JSON.stringify({data: {...form, "people": parseInt(form.people)}})
-            }).then(async (returned)=> {
-                const response = await returned.json()
-                if (response.error) {
-                    setFormSubmitted(true)
-                    setError(response.error)
+            try {
+                const abortController = new AbortController()
+                await fetch(`${API_BASE_URL}/reservations`, {
+                    method: 'POST',
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify({data: {...form, "people": parseInt(form.people)}}),
+                    signal: abortController.signal
+                }).then(async (returned)=> {
+                    const response = await returned.json()
+                    if (response.error) {
+                        setFormSubmitted(true)
+                        setError(response.error)
+                    } else {
+                        // console.log( "saved form ", response)
+                        history.push(`/dashboard?date=${form.reservation_date}`)                    
+                    }
+                })                
+            } catch (error) {
+                if (error.name === "AbortError") {
+                  console.log("Request was aborted.")
                 } else {
-                    // console.log( "saved form ", response)
-                    history.push(`/dashboard?date=${form.reservation_date}`)                    
+                  console.error("An error occurred: ", error)
                 }
-            })
+              }
         }
     }
     return <div>

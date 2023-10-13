@@ -21,29 +21,39 @@ function SearchPage() {
             [e.target.name]: e.target.value
         })
     }
-    console.log(form)
+    // console.log(form)
     const searchHandler = async (e) => {
         e.preventDefault()
         // setClicked(true)
         // console.log(form)
+        try {
+            const abortController = new AbortController()
             const response = await fetch(
                 `${API_BASE_URL}/reservations?mobile_number=${form.mobile_number}`,
                 {
                     method: 'GET',
                     headers: {
                         "Content-type": "application/json;Charset=UTF-8"
-                    }                
+                    },
+                    signal: abortController.signal         
                 }
             );
             const reservations = await response.json();
-            console.log(";;;;;;;", reservations)
+            // console.log(";;;;;;;", reservations)
             if (reservations.data.length === 0) {
                 setErr("No reservations found")
             } else {
                 setReservations(reservations.data)
+            }            
+        } catch (error) {
+            if (error.name === "AbortError") {
+              console.log("Request was aborted.")
+            } else {
+              console.error("An error occurred: ", error)
             }
+          }
     }
-    console.log(reservations)
+    // console.log(reservations)
     return (
         <div>
             <div>

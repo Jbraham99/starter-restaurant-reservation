@@ -7,6 +7,8 @@ function ReservationEditForm({date}) {
     // console.log(reservation_id)
     const [reservation, setReservation] = useState(null)
     useEffect(()=>{
+        try {
+        const abortController = new AbortController()
         async function getReservation(id){
             const result = await fetch(
                 `${API_BASE_URL}/reservations/${id}/edit`,
@@ -15,14 +17,23 @@ function ReservationEditForm({date}) {
                     body: JSON.stringify(),
                     headers: {
                         "Content-type": "application/json;charset=UTF-8"
-                    }
+                    },
+                    signal: abortController.signal
                 }
             )
             const reservation = await result.json()
             // console.log("FETCHED: ", reservation.data)
             setReservation(reservation.data)
         }
-        getReservation(reservation_id)
+        getReservation(reservation_id)            
+        }  catch (error) {
+            if (error.name === "AbortError") {
+              console.log("Request was aborted.")
+            } else {
+              console.error("An error occurred: ", error)
+            }
+          }
+
     }, [reservation_id])
     return <div>
         {reservation ? <div><h2>Edit Reservation</h2>

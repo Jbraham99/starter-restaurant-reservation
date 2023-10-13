@@ -46,6 +46,8 @@ function ReservationCard({ reservation, loadDashboard }) {
   const cancelReservation = async (e) => {
     e.preventDefault();
     if (window.confirm(`Do you want to cancel this reservation? This cannot be undone.`)) {
+      const abortController = new AbortController()
+      try {
         await fetch(
             `${API_BASE_URL}/reservations/${reservation_id}/status`,
             {
@@ -53,18 +55,24 @@ function ReservationCard({ reservation, loadDashboard }) {
                 body: JSON.stringify({data: {...reservation, "status": "cancelled"}}),
                 headers: {
                     "Content-type": "application/json;charset=UTF-8"
-                }
+                },
+                signal: abortController.signal
             }
         ).then( async (returned)=>{
           const response = await returned.json()
           if(!response.error) {
             setRservationForCard(response.data)
-            console.log("cancelled reservation", response.data)
             loadDashboard()
           }
 
-        })
-        // window.location.reload(true)
+        })        
+      } catch (error) {
+        if (error.name === "AbortError") {
+          console.log("Request was aborted.")
+        } else {
+          console.error("An error occurred: ", error)
+        }
+      }
     }
   }
   return (

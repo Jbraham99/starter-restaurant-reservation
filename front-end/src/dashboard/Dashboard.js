@@ -50,26 +50,35 @@ function Dashboard({ date }) {
 
   useEffect(()=>{
     async function reservationStatus(){
+      const abortController = new AbortController()
       if (finishedRes) {
-      await fetch(
-        `${API_BASE_URL}/reservations/${finishedRes.reservation_id}/status`,
-        {
-          method: "PUT",
-          body: JSON.stringify({data: {...finishedRes, "status": "Finished"}}),
-          headers: {
-            "Content-type": "application/json;charset=UTF-8"
+        try {
+        await fetch(
+          `${API_BASE_URL}/reservations/${finishedRes.reservation_id}/status`,
+          {
+            method: "PUT",
+            body: JSON.stringify({data: {...finishedRes, "status": "Finished"}}),
+            headers: {
+              "Content-type": "application/json;charset=UTF-8"
+            },
+            signal: abortController.signal
+          }
+        ).then(async (returned)=> {
+          await returned.json()
+          loadDashboard()
+          loadTables()
+        })          
+        } catch (error) {
+          if (error.name === "AbortError") {
+            console.log("Request was aborted.")
+          } else {
+            console.error("An error occurred: ", error)
           }
         }
-      ).then(async (returned)=> {
-        const response = await returned.json()
-        console.log("DELETE: ", response)
-        loadDashboard()
-        loadTables()
-      })
       }
     }
     reservationStatus()
-}, [finishedRes, ])
+}, [finishedRes])
   //Event Handlers
   const finishTable = async (e) => {
     e.preventDefault()
@@ -79,24 +88,31 @@ function Dashboard({ date }) {
     const finishedReservation = reservations.find((res)=> res.reservation_id === finishedTable.reservation_id)
     if (window.confirm(`Is this table ready to seat new guests? This cannot be undone.`)) {
       setFinishedRes(finishedReservation)
-        await fetch(
-          `${API_BASE_URL}/tables/${tableNum}/seat`,
-          {
-            method: "DELETE",
-            body: JSON.stringify({data: {"reservation_id": null}}),
-            headers: {
-              "Content-type": "application/json;charset=UTF-8"
+      const abortController = new AbortController()
+      try {
+          await fetch(
+            `${API_BASE_URL}/tables/${tableNum}/seat`,
+            {
+              method: "DELETE",
+              body: JSON.stringify({data: {"reservation_id": null}}),
+              headers: {
+                "Content-type": "application/json;charset=UTF-8"
+              },
+              signal: abortController.signal
             }
-          }
-        ).then(async (returned)=> {
-        const response = await returned.json()
-        console.log("PUT: ", response)
-        loadDashboard()
-      })
+          ).then(async (returned)=> {
+          await returned.json()
+          loadDashboard()
+        })        
+      } catch (error) {
+        if (error.name === "AbortError") {
+          console.log("Request was aborted.")
+        } else {
+          console.error("An error occurred: ", error)
+        }
+      }
     }
   }
-
-  console.log(reservations)
   return (
     <main>
       <h1>Dashboard</h1>
