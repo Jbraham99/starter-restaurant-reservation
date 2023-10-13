@@ -42,7 +42,7 @@ function destroy(table) {
 }
 
 function destroyTable(table) {
-  console.log("destroyTable", table)
+  ("destroyTable", table)
   return knex("tables")
     .where({
       "table_id": table.table_id

@@ -54,7 +54,7 @@ function validTableCapacity(req, res, next) {
 
 async function create(req, res) {
     const {newTable} = res.locals
-    console.log("%%%%", req.body.data)
+    // console.log("%%%%", req.body.data)
     const table = await service.create(newTable)
     res.status(201).json({data: table[0]})
 }
@@ -80,7 +80,7 @@ async function tableExists(req, res, next) {
 async function tableCap(req, res, next) {
     const {table} = res.locals;
     const resData = req.body.data
-    console.log("TABLE CAP TABLES", resData)
+    // console.log("TABLE CAP TABLES", resData)
     if (!resData) {
         return next({
             status: 400,
@@ -94,7 +94,7 @@ async function tableCap(req, res, next) {
         })
     }
     const resNum = Number(resData.reservation_id)
-    console.log("resNum: ", resNum)
+    // console.log("resNum: ", resNum)
     const reservation = await service.reservation(resNum)
     if (!reservation) {
         return next({
@@ -130,7 +130,7 @@ async function tableCap(req, res, next) {
 //check if table is occupied or not
 function occupiedOrFree(req, res, next) {
     const { table } = res.locals
-    console.log("table status: ", table)
+    // console.log("table status: ", table)
     if (table.reservation_id) {
         return next({
             status: 400,
@@ -143,7 +143,7 @@ function occupiedOrFree(req, res, next) {
 //function when deleting to check if the table is NOT occupied
 function tableNotOccupied(req, res, next) {
     const {table} = res.locals;
-    console.log("TABLE NOT OCCUPIED", table)
+    // console.log("TABLE NOT OCCUPIED", table)
     if (table.reservation_id) {
         return next()
     }
@@ -166,34 +166,34 @@ async function update(req, res) {
         "reservation_id": Number(reservation.reservation_id),
         "status": "occupied"
     }
-    console.log("TABLE DATA: ", newTable)
+    ("TABLE DATA: ", newTable)
     const changedTable = await service.update(newTable)
     res.status(200).json({data: newReservation})
 }
 
 async function destroy(req, res, next) {
-    console.log("TEST*&*&*&*&")
+    ("TEST*&*&*&*&")
     const {table, reservation} = res.locals
-    console.log("DESTROY: ", table, "RESREVATION: ", reservation)
+    ("DESTROY: ", table, "RESREVATION: ", reservation)
     const newReservation = {
         // ...reservation,
         "reservation_id": table.reservation_id,
         "status": "finished"
     }
     const updatedReservation = await service.updateReservation(newReservation)
-    console.log("UPDATE RESERVATION: ", updatedReservation)
+    ("UPDATE RESERVATION: ", updatedReservation)
     const finishedTable = {
         ...table,
         "reservation_id": null
     }
-    console.log("FINISHED TABLE!!", finishedTable)
+    ("FINISHED TABLE!!", finishedTable)
     const deletingTable = await service.destroyTable(finishedTable)
-    console.log("FINISHED TABLE", finishedTable)
+    ("FINISHED TABLE", finishedTable)
     res.status(200).json({data: [updatedReservation, finishedTable]})
 }
 
 function testing(req, res, next) {
-    console.log("*****TEST MIDDLEWARE*****")
+    ("*****TEST MIDDLEWARE*****")
     next()
 }
 

@@ -10,7 +10,7 @@ const methodNotAllowed = require("../errors/methodNotAllowed")
 
 router.route("/:reservation_id/status").delete(controller.delete).put(controller.update);
 
-router.route("/:reservation_id/edit").get(controller.read)
+router.route("/:reservation_id/edit").get(controller.read).put(controller.edit)
 
 router.route("/:reservation_id").get(controller.read).put(controller.edit)
 

@@ -38,11 +38,13 @@ function update(resStatus) {
 }
 
 
-function listByNum(number) {
-    return knex("reservations")
-      .select("*")
-      .where("mobile_number", "like",  `%${number}%`)
-
+function listByNum(mobile_number) {
+  return knex("reservations")
+    .whereRaw(
+      "translate(mobile_number, '() -', '') like ?",
+      `%${mobile_number.replace(/\D/g, "")}%`
+    )
+    .orderBy("reservation_date");
 }
 
 function edit(reservation) {

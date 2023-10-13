@@ -26,7 +26,7 @@ function Dashboard({ date }) {
   // useEffect(()=>{
   //   console.log("USE EFFECT RESERVATIONS ", reservations)
   // }, [reservations])
-  console.log(tables)
+  // console.log(tables)
   useEffect(loadDashboard, [date]);
   // useEffect(loadTables, [])
 
@@ -88,6 +88,7 @@ function Dashboard({ date }) {
         ).then(async (returned)=> {
         const response = await returned.json()
         console.log("PUT: ", response)
+        loadDashboard()
       })
     }
   }
@@ -116,13 +117,11 @@ function Dashboard({ date }) {
       {!reservations ? <ErrorAlert error={reservationsError} /> : (
         <div>
           {reservations.map((reservation)=> {
-                // console.log("RESERVATION DATE LIST", reservation)  
-              if (reservation.status === "booked" || reservation.status === "seated") {
-              
-                return <ReservationCard key={reservation.reservation_id} loadDashboard={loadDashboard} reservation={reservation}/> 
-              } else {
-                  return ""                
-              }
+                // console.log("RESERVATION DATE LIST", reservation)
+                if (reservation.status.toLowerCase() !== "cancelled" && reservation.status.toLowerCase() !== "finished") {
+                  return <ReservationCard key={reservation.reservation_id} loadDashboard={loadDashboard} reservation={reservation}/>
+                }
+                return ""
           })}
         </div>
       )}

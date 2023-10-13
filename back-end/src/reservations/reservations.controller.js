@@ -31,9 +31,29 @@ function dateCompare(reservationDate, currentDate) {
   return false
 }
 
-async function list(req, res) {
-  const {date, mobile_number} = req.query
+function phoneNumberQueryHandler(req, res, next) {
+  let {mobile_number} = req.query
+  if (!mobile_number) {//skips if there was no mobile_number query
+    return next()
+  }
+  const splitNum = mobile_number.split('-')
+  const joinedNum = splitNum.join('')
+  const numToNumber = Number(joinedNum)
+  if (typeof numToNumber === "number") {
+    res.locals.mobileNumber = joinedNum
+    return next()
+  }
+  next({
+    status: 400,
+    message: "please give a valid phone number"
+  })
+}
+
+async function list(req, res, next) {
+  const {mobileNumber} = res.locals
+  const {date} = req.query
   if (date) {
+    // console.log("****&&&&", date)
   const result = await service.list(date)
   const sorted = result.sort((res1, res2) => {
     const today = new Date();
@@ -41,12 +61,18 @@ async function list(req, res) {
     const time2 = new Date(today.toDateString() + ' ' + res2.reservation_time);
     return time1 - time2;
   });
+  // console.log("****&&&", sorted)
   res.json({data: sorted})
-  } else if (mobile_number) {
-    const reservations = await service.listByNum(mobile_number)
-    console.log("MOBILE NUMBER QUERY: ", reservations)
-    if (reservations) {
+  } else if (mobileNumber) {
+    const reservations = await service.listByNum(mobileNumber)
+    // console.log("MOBILE NUMBER QUERY: ", req.query)
+    if (reservations.length > 0) {
       return res.json({data: reservations})
+    } else {
+      return next({
+        status:400,
+        message: "No reservations found"
+      })
     }
   } else {
     const result = await service.list(getCurrentDate())
@@ -144,6 +170,25 @@ function ValidReservation(req, res, next) {
   return next();
 }
 
+function validMobileNumber(req, res, next) {
+  const {mobile_number} = req.body.data
+  console.log("VALID MOBILE_NUMBER: ", mobile_number)
+  const numSplit = mobile_number.split(/[()-]/)
+  console.log("VALID MOBILE_NUMBER: ", numSplit)
+  const numJoinedBack = numSplit.join("")
+  console.log("VALID MOBILE_NUMBER: ", numJoinedBack)
+  const numToNumber = Number(numJoinedBack)
+  console.log("VALID MOBILE_NUMBER: ", numToNumber)
+  if(isNaN(numToNumber)) {
+    return next({
+      status: 400,
+      message: "mobile_number must be a valid number"
+    })
+  } else {
+    next()    
+  }
+}
+
 //Function to make sure that the reservations booked during opperation hours
 function opperationHours(req, res, next) {
   const {newReservation} = res.locals;
@@ -177,13 +222,13 @@ function closedTuesdays(req, res, next) {
 
   const {newReservation} = res.locals;//reservation date gotten
   const resDate = new Date(newReservation.reservation_date)
-  console.log("###", resDate)  
+  // console.log("###", resDate)  
   const dayOfWeek = resDate.getUTCDay()
     // if (dayOfWeek === 2) {
     //closedDay = [2]
-    console.log("DAY OF WEEK", dayOfWeek)
+    // console.log("DAY OF WEEK", dayOfWeek)
     if (closedDay.includes(dayOfWeek)) {
-      console.log("INSIDE IF ")
+      // console.log("INSIDE IF ")
       return next({
         status: 400,
         message: "closed on Tuesdays, sorry for the inconvenience."
@@ -194,7 +239,7 @@ function closedTuesdays(req, res, next) {
 
 function checkReservationStatus(req, res, next) {
   const {status} = res.locals.newReservation
-  console.log(status)
+  // console.log(status)
   if(status === "seated" || status === "finished") {
     return next({
       status: 400,
@@ -206,16 +251,16 @@ function checkReservationStatus(req, res, next) {
 
 async function create(req, res, next) {
   const newReservation = req.body.data
-  console.log("RESERVATION DATA: ", newReservation)
+  // console.log("RESERVATION DATA: ", newReservation)
   const reservation = await service.create(newReservation)
-  console.log("NEW RESERVATION*:", reservation)
+  // console.log("NEW RESERVATION*:", reservation)
   res.status(201).json({data: reservation})
 }
 
 async function reservationExists(req, res, next) {
-  console.log("TESTING!!!")
+  // console.log("TESTING!!!")
   const {reservation_id} = req.params;
-  console.log("RESERVATION_ID: ", reservation_id)
+  // console.log("RESERVATION_ID: ", reservation_id)
   if (!reservation_id) {
     return next({
       status: 404,
@@ -238,6 +283,7 @@ async function reservationExists(req, res, next) {
 
 function validStatus(req, res, next) {
   const {status} = req.body.data
+  // console.log("VALID STATUS MIDDLE: ", req.body.data)
   if (status === "unknown") {
     return next({
       status: 400,
@@ -254,17 +300,17 @@ function validStatus(req, res, next) {
 
 async function destroy(req, res, next) {
   const bodyData = req.body.data
-  console.log("REQUEST BODY", bodyData)
+  // console.log("REQUEST BODY", bodyData)
   const updated = await service.update(bodyData)
   // console.log("updated: ", updated)
-  res.status(202).json(updated)
+  res.status(202).json({data: updated})
 }
 
 async function update(req, res, next) {
   const {reservation} = res.locals
   // console.log("reservation", reservation)
   const {status} = req.body.data
-  console.log("STATUS:!! ", status)
+  // console.log("STATUS:!! ", status)
   const updatedReservation = {
     ...reservation,
     "status": status
@@ -292,7 +338,7 @@ function isValidTime(time) {
 
 function ifFinished(req, res, next) {
   const {reservation} = res.locals
-  if (reservation.status === "finished") {
+  if (reservation.status.toLowerCase() === "finished") {
     return next({
       status: 400,
       message: "reservation is already finished"
@@ -359,12 +405,15 @@ function validChanges(req, res, next) {
     })
   }
   if (typeof people !== "number") {
+    if (Number(people) !== NaN) {
+      return next()
+    }
     return next({
       status: 400,
       message: "people must be a number"
     })
   }
-  console.log("EDIT DATA: ", editData)
+  // console.log("EDIT DATA: ", editData)
   next()
 }
 
@@ -375,10 +424,16 @@ async function edit(req, res, next) {
   res.status(200).json({data: bodyData})
 }
 
+
+
 module.exports = {
-  list: [asyncErrorBoundary(list)],
+  list: [
+    phoneNumberQueryHandler,
+    asyncErrorBoundary(list)
+  ],
   create: [
     ValidReservation,
+    validMobileNumber,
     checkReservationStatus,
     noBeforeCurrentDate,
     closedTuesdays,

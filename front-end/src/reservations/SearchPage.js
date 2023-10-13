@@ -10,42 +10,51 @@ function SearchPage() {
     const initForm = {
         mobile_number: ""
     }
-    const [reservations, setReservations] = useState(null)
+    const [reservations, setReservations] = useState([])
     const [form, setForm] = useState(initForm);
     const [clicked, setClicked] = useState(false)
+    const [err, setErr] = useState(null)
     const changeHandler = (e) => {
+        setErr(null)
         setForm({
             ...form,
             [e.target.name]: e.target.value
         })
     }
+    console.log(form)
     const searchHandler = async (e) => {
         e.preventDefault()
         setClicked(true)
         // console.log(form)
-        const response = await fetch(
-            `${API_BASE_URL}/reservations?mobile_number=${form.mobile_number}`,
-            {
-                method: 'GET',
-                headers: {
-                    "Content-type": "application/json;Charset=UTF-8"
-                }                
+            const response = await fetch(
+                `${API_BASE_URL}/reservations?mobile_number=${form.mobile_number}`,
+                {
+                    method: 'GET',
+                    headers: {
+                        "Content-type": "application/json;Charset=UTF-8"
+                    }                
+                }
+            );
+            const reservations = await response.json();
+            console.log(";;;;;;;", reservations)
+            if (reservations.error) {
+                setErr(reservations.error)
+            } else {
+                setReservations(reservations.data)
             }
-        );
-        const reservation = await response.json();
-        setReservations(reservation)
     }
-    // console.log(reservations)
+    console.log(reservations)
     return (
         <div>
             <div>
             <label htmlFor="mobile_number"><h2>Search reservation by phone number!</h2></label>
-            <input type="text" name="mobile_number" id="mobile_number" placeholder="Enter customer's phone number" maxLength={10} onChange={changeHandler} value={form.mobile_number} required/>
-            <button onClick={searchHandler} value={form}>Find</button>
+            {err? <div className="alert alert-danger">{err}</div> : ""}
+            <input type="text" name="mobile_number" id="mobile_number" placeholder="Enter customer's phone number" onChange={changeHandler} value={form.mobile_number} required/>
+            <button onClick={searchHandler} value={form} type="submit">Find</button>
             </div>
-            {reservations ? <div>{reservations.map((reservation)=>{
-                return <ReservationCard reservation={reservation}/>
-            })}</div> : <div>{clicked? <p>No reservations found</p>: ""}</div>}      
+            {reservations.length > 0 ? <div>{reservations.map((reservation)=>{
+                return <ReservationCard key={reservation.reservation_id} reservation={reservation}/>
+            })}</div> : ""}      
         </div>
     )
 }

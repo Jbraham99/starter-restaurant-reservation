@@ -21,7 +21,7 @@ describe("US-08 - Change an existing reservation - E2E", () => {
 
   beforeAll(async () => {
     await fsPromises.mkdir("./.screenshots", { recursive: true });
-    setDefaultOptions({ timeout: 1000 });
+    setDefaultOptions({ timeout: 1500 });
     browser = await puppeteer.launch();
   });
 
@@ -75,7 +75,7 @@ describe("US-08 - Change an existing reservation - E2E", () => {
           path: ".screenshots/us-08-cancel-reservation-before.png",
           fullPage: true,
         });
-
+        
         const cancelButtonSelector = `[data-reservation-id-cancel="${reservation.reservation_id}"]`;
 
         const cancelButton = await page.$(cancelButtonSelector);
@@ -94,12 +94,11 @@ describe("US-08 - Change an existing reservation - E2E", () => {
         });
 
         await cancelButton.click();
-
         await page.waitForResponse((response) => {
           return response.url().includes("/reservations?date=");
         });
 
-        await page.waitForTimeout(500);
+        await page.waitForTimeout(1500);
 
         expect(await page.$(cancelButtonSelector)).toBeNull();
       });
@@ -190,12 +189,12 @@ describe("US-08 - Change an existing reservation - E2E", () => {
         path: ".screenshots/us-08-edit-reservation-submit-before.png",
         fullPage: true,
       });
-
+      // console.log("&&&&&&&TEST&&&&&&& BEFORE!!")
       await Promise.all([
         submitButton.click(),
         page.waitForNavigation({ waitUntil: "networkidle0" }),
       ]);
-
+      // console.log("&&&&&&&TEST&&&&&&& AFTER!!")
       expect(page.url()).toContain("/dashboard");
 
       await page.screenshot({

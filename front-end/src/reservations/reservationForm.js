@@ -13,7 +13,6 @@ function ReservationForm({date, reservation}) {
         last_name: "",
         mobile_number: "",
         reservation_date: "",
-        status: "Booked",
         reservation_time: "",
         people: 2
     }
@@ -23,6 +22,7 @@ function ReservationForm({date, reservation}) {
             ...editFormData,
             [e.target.name]: e.target.value
         })
+        // console.log("*&*&*&", editFormData)
     }
     const changeHandler = (event) => {
         setForm({
@@ -40,7 +40,9 @@ function ReservationForm({date, reservation}) {
                 method: 'PUT',
                 headers: {"Content-Type": "application/json"},
                 body: JSON.stringify({data: editFormData})
-            }).then(()=> {
+            }).then(async (returned)=> {
+                const response = await returned.json()
+                console.log("response: ", response)
             })
             history.push(`/dashboard?date=${editFormData.reservation_date}`)
         } else {
@@ -68,7 +70,7 @@ function ReservationForm({date, reservation}) {
         <label htmlFor="last_name">Last Name</label>
         <input type="text" name="last_name" id="last_name" value={form.last_name} onChange={changeHandler} required/>
         <label htmlFor="mobile_number">Mobile Number</label>
-        <input type="text" name="mobile_number" id="mobile_number" value={form.mobile_number} onChange={changeHandler} maxLength={10} required/>
+        <input type="text" name="mobile_number" id="mobile_number" value={form.mobile_number} onChange={changeHandler} maxLength={13} required/>
         <label htmlFor="reservation_date">Reservation Date</label>
         <input type="date" name="reservation_date" id="date" value={form.reservation_date} onChange={changeHandler} required/>
         <label htmlFor="reservation_time">Reservation Time</label>
@@ -83,9 +85,9 @@ function ReservationForm({date, reservation}) {
         <label htmlFor="last_name">Last Name</label>
         <input type="text" name="last_name" id="last_name" value={editFormData.last_name} onChange={editFormHandler} required/>
         <label htmlFor="mobile_number">Mobile Number</label>
-        <input type="text" name="mobile_number" id="mobile_number" value={editFormData.mobile_number} onChange={editFormHandler} maxLength={10} required/>
+        <input type="text" name="mobile_number" id="mobile_number" value={editFormData.mobile_number} onChange={editFormHandler} maxLength={13} required/>
         <label htmlFor="reservation_date">Reservation Date</label>
-        <input type="date" name="reservation_date" id="date" min={date} value={editFormData.reservation_date} onChange={editFormHandler} required/>
+        <input type="date" name="reservation_date" id="date" min={date} value={editFormData.reservation_date} onChange={editFormHandler} />
         <label htmlFor="reservation_time">Reservation Time</label>
         <input type="time" name="reservation_time" id="time" min="10:30" max="21:30" value={editFormData.reservation_time} onChange={editFormHandler} required/>
         <label htmlFor="people">People</label>
