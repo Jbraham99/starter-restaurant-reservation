@@ -117,7 +117,7 @@ function Dashboard({ date }) {
         <div>
           {reservations.map((reservation)=> {
                 // console.log("RESERVATION DATE LIST", reservation)  
-              if (reservation.status === "Booked" || reservation.status === "Seated") {
+              if (reservation.status === "booked" || reservation.status === "seated") {
               
                 return <ReservationCard key={reservation.reservation_id} loadDashboard={loadDashboard} reservation={reservation}/> 
               } else {
@@ -132,13 +132,14 @@ function Dashboard({ date }) {
           <ErrorAlert error={tablesError} />
           <TablesList onFinish={onFinish} tables={tables} />
         </div> */}
-      {tables.map((table)=>{
+      {tables.length > 0 && tables.map((table)=>{
         return <div className="bg-secondary w-25 p-3" key={table.table_id}>
           <h6>{`${table.table_name}`}</h6>
-          {table.reservation_id ? <h4 data-table-id-status={`${table.table_id}`}>occupied</h4> : <h4 data-table-id-status={`${table.table_id}`}>free</h4>}
+          {table.reservation_id ? <p data-table-id-status={table.table_id}>occupied<button data-table-id-finish={table.table_id} data-reservation-id-finish={table.reservation_id} value={table.table_id} onClick={finishTable}>finish</button></p> : <p data-table-id-status={`${table.table_id}`}>free</p>}
           <p>{`Capacity: ${table.capacity}`}</p>
-          {table.reservation_id ? <button data-table-id-finish={table.table_id} data-reservation-id-finish={table.reservation_id} value={table.table_id} onClick={finishTable}>Finish</button> : ""}
+          {/* {table.reservation_id ?  : ""} */}
         </div>
+        
       })}
       </> : <p>Loading...</p>}
     </main>

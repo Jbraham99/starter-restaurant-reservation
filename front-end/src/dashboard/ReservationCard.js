@@ -70,7 +70,7 @@ function ReservationCard({ reservation, loadDashboard }) {
         <button >Edit</button>        
       </a>
 
-      {status === "Booked"? (
+      {status === "booked"? (
 
         <a href={`/reservations/${reservation_id}/seat`}>
           <button onClick={updateReservation} value={reservation_id}>

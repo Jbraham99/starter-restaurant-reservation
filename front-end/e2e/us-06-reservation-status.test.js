@@ -40,7 +40,7 @@ describe("US-06 - Reservation status - E2E", () => {
         reservation_time: "13:45",
         people: 4,
       });
-
+      // console.log("*****", reservation )
       table = await createTable({
         table_name: `#${Date.now().toString(10)}`,
         capacity: 99,

@@ -56,7 +56,7 @@ async function create(req, res) {
     const {newTable} = res.locals
     console.log("%%%%", req.body.data)
     const table = await service.create(newTable)
-    res.status(201).json({data: newTable})
+    res.status(201).json({data: table[0]})
 }
 
 async function tableExists(req, res, next) {

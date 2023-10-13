@@ -105,7 +105,7 @@ function Seating() {
           );
           await fetch(`${API_BASE_URL}/reservations/${reservation_id}/status`, {
             method: "DELETE",
-            body: JSON.stringify({data: { ...reservation, status: "Seated" }}),
+            body: JSON.stringify({data: { ...reservation, status: "seated" }}),
             headers: {
               "Content-type": "application/json;charset=UTF-8",
             },
