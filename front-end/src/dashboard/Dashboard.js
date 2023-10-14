@@ -115,9 +115,11 @@ function Dashboard({ date }) {
   }
   return (
     <main>
+      <div className="d-flex justify-content-around">
       <h1 class="text-justify">Dashboard</h1>
-      <div className="d-md-flex mb-3 d-flex">
-        <h4 className="mb-0">Reservations for {dashDate}</h4>
+      <h3 className="mb-0">Reservations for {dashDate}</h3>           
+      </div>
+      <div className="d-md-flex mb-3 d-flex">  
       </div>
       <div className="btn-group d-flex justify-content-around mb-4">
         <Link to={`/dashboard?date=${previous(dashDate)}`}>
@@ -133,7 +135,7 @@ function Dashboard({ date }) {
       </div>
       
       {!reservations ? <ErrorAlert error={reservationsError} /> : (
-        <div>
+        <div className="row">
           {reservations.map((reservation)=> {
                 // console.log("RESERVATION DATE LIST", reservation)
                 if (reservation.status.toLowerCase() !== "cancelled" && reservation.status.toLowerCase() !== "finished") {
@@ -149,15 +151,16 @@ function Dashboard({ date }) {
           <ErrorAlert error={tablesError} />
           <TablesList onFinish={onFinish} tables={tables} />
         </div> */}
+      <div className="row justify-content-between">
       {tables.length > 0 && tables.map((table)=>{
-        return <div className="bg-light shadow p-3 mg-5 rounded m-4" key={table.table_id}>
+        return <div className="bg-transparent shadow p-3 mg-5 rounded m-4 col-sm-5 col-md-3" key={table.table_id}>
           <h6>{`${table.table_name}`}</h6>
           {table.reservation_id ? <p data-table-id-status={table.table_id}>occupied<button data-table-id-finish={table.table_id} data-reservation-id-finish={table.reservation_id} value={table.table_id} onClick={finishTable} className="btn btn-lg btn-success">finish</button></p> : <p data-table-id-status={`${table.table_id}`}>free</p>}
           <p>{`Capacity: ${table.capacity}`}</p>
           {/* {table.reservation_id ?  : ""} */}
         </div>
-        
       })}
+      </div>
       </> : <p>Loading...</p>}
     </main>
   );

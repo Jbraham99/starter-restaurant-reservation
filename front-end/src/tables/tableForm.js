@@ -50,20 +50,23 @@ function TablesForm() {
     return <div>
         <h1>Create a new table</h1>
         {formSubmitted && error ? <div className="alert alert-danger">{error}</div> : ""}
-        <form onSubmit={submitHandler}>
-            <div className="d-flex justify-content-between mb-4">
-        <label htmlFor="table_name">Table name</label>
-        <input type="text" id="table_name" name="table_name" value={table.table_name} onChange={changeHandler}/>
-            </div>
-            <div className="d-flex justify-content-between mb-4">
-        <label htmlFor="capacity">Capacity</label>
-        <input type="text" id="capacity" name="capacity" value={table.capacity} onChange={changeHandler}/>
-            </div>
-            <div className="d-flex justify-content-around mb-4">
-        <button className="btn btn-lg btn-dark" type="button" onClick={()=> history.goBack()}>Cancel</button>
-        <button className="btn btn-lg btn-primary" type="submit">Submit</button>
-            </div>
-    </form></div>
+        <div className="shadow p-3 mb-5 rounded">
+            <form onSubmit={submitHandler}>
+                <div className="d-flex justify-content-between mb-4">
+            <label htmlFor="table_name">Table name</label>
+            <input className="bg-light" type="text" id="table_name" name="table_name" value={table.table_name} onChange={changeHandler}/>
+                </div>
+                <div className="d-flex justify-content-between mb-4">
+            <label htmlFor="capacity">Capacity</label>
+            <input className="bg-light" type="text" id="capacity" name="capacity" value={table.capacity} onChange={changeHandler}/>
+                </div>
+                <div className="d-flex justify-content-around mb-4">
+            <button className="btn btn-lg btn-dark" type="button" onClick={()=> history.goBack()}>Cancel</button>
+            <button className="btn btn-lg btn-primary" type="submit">Submit</button>
+                </div>
+        </form></div>           
+        </div>
+ 
 }
 
 export default TablesForm

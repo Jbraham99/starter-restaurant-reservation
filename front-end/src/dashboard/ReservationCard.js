@@ -76,18 +76,18 @@ function ReservationCard({ reservation, loadDashboard }) {
     }
   }
   return (
-    <div>
-      {status.toLowerCase? <div className="bg-warning shadow p-3 mb-5 rounded">
+    <div className="col-sm-6 col-lg-4">
+      {status.toLowerCase? <div className="bg-dark text-light shadow p-3 mb-5 rounded">
         <h2>{`${last_name}, ${first_name}(${people})`}</h2>
         <h5>{reservation_date} @ {reservation_time}</h5>
         <h6 data-reservation-id-status={reservation.reservation_id}>{status.toLowerCase()}</h6>
         <p>Ph#: {mobile_number}</p>
         <div className="btn-group m-1">
-          <button class="btn btn-outline-dark"><a href={`/reservations/${reservation_id}/edit`}>Edit</a></button>        
+          <button class="btn btn-outline-warning"><a href={`/reservations/${reservation_id}/edit`}>Edit</a></button>        
         
         {status.toLowerCase() === "booked" ? 
           <a href={`/reservations/${reservation_id}/seat`} class="text-decoration-none">
-            <button onClick={updateReservation} value={reservation_id} class="btn btn-outline-dark">Seat</button>
+            <button onClick={updateReservation} value={reservation_id} class="btn btn-outline-success">Seat</button>
             </a>: ""}
         {status !== "cancelled" && status.toLowerCase() !== "finished" ? <button data-reservation-id-cancel={reservation.reservation_id} onClick={cancelReservation} class="btn btn-outline-danger">Cancel</button> : ""}
         </div>
