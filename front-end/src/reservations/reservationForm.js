@@ -23,6 +23,7 @@ function ReservationForm({date, reservation}) {
             [e.target.name]: e.target.value
         })
         // console.log("*&*&*&", editFormData)
+        // console.log("**", editFormData.reservation_date.slice(0, 10))
     }
     const changeHandler = (event) => {
         setForm({
@@ -42,16 +43,19 @@ function ReservationForm({date, reservation}) {
                     await fetch(`${API_BASE_URL}/reservations/${reservation.reservation_id}/edit`, {
                         method: 'PUT',
                         headers: {"Content-Type": "application/json"},
-                        body: JSON.stringify({data: {...editFormData, "people": Number(editFormData.people)}}),
+                        body: JSON.stringify({data: {...editFormData, "people": Number(editFormData.people), "reservation_date": editFormData.reservation_date.slice(0, 10)}}),
                         signal: abortController.signal
                     }).then(async (returned)=> {
                         const response = await returned.json()
                         if (response.error) {
+                            console.log(response.error)
                             setFormSubmitted(true)
                             setError(response.error)
+                        } else {
+                            console.log("***", editFormData.reservation_date)
+                        history.push(`/dashboard?date=${editFormData.reservation_date}`)                             
                         }
                     })
-                    history.push(`/dashboard?date=${editFormData.reservation_date}`)                
                 }  catch (error) {
                     if (error.name === "AbortError") {
                     // console.log("Request was aborted.")
@@ -108,7 +112,7 @@ function ReservationForm({date, reservation}) {
         </div>
         <div className="d-flex justify-content-between mb-3">
         <label htmlFor="reservation_date">Reservation Date</label>
-        <input className="bg-light" type="date" name="reservation_date" id="date" value={form.reservation_date} onChange={changeHandler} required/>
+        <input className="bg-light" type="date" name="reservation_date" id="date" value={form.reservation_date} onChange={changeHandler} />
         </div>
         <div className="d-flex justify-content-between mb-3">
         <label htmlFor="reservation_time">Reservation Time</label>

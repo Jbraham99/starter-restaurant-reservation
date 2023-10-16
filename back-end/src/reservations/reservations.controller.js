@@ -184,6 +184,19 @@ function validMobileNumber(req, res, next) {
   }
 }
 
+function operationHoursEdit(req, res, next) {
+  const editData = req.body.data;
+  const time = editData.reservation_time;
+  if (time < "10:30" || time > "21:30") {
+    return next({
+      status: 400,
+      message: `Invalid reservation_time: ${time}, reserve between 10:30AM and 9:30PM.`
+    })
+
+  }
+  next()
+}
+
 //Function to make sure that the reservations booked during opperation hours
 function opperationHours(req, res, next) {
   const {newReservation} = res.locals;
@@ -212,9 +225,41 @@ function noBeforeCurrentDate(req, res, next) {
   }
   next()
 }
+
+function neEditBeforeCurrentDate(req, res, next) {
+  const editData = req.body.data
+  // console.log("&&&", editData.reservation_date)
+  const resDate = editData.reservation_date;//reservation date
+  // console.log("RESDATE - ", resDate)
+  const today = getCurrentDate();
+  // console.log("currentDate", today)
+  if (dateCompare(resDate, today)) {
+    return next({
+      status: 400,
+      message: "Reservation must be in the future."
+    })
+  }
+  next()
+}
+function noTuesdayEdit(req, res, next) {
+  const editData = req.body.data
+  const resDate = new Date(editData.reservation_date)
+  // console.log("###", resDate)  
+  const dayOfWeek = resDate.getUTCDay()
+    // if (dayOfWeek === 2) {
+    //closedDay = [2]
+    // console.log("DAY OF WEEK", dayOfWeek)
+    if (closedDay.includes(dayOfWeek)) {
+      // console.log("INSIDE IF ")
+      return next({
+        status: 400,
+        message: "closed on Tuesdays, sorry for the inconvenience."
+      })
+  }
+  next()
+}
 //Function that doesn't allow booking on Tuesdays
 function closedTuesdays(req, res, next) {
-
   const {newReservation} = res.locals;//reservation date gotten
   const resDate = new Date(newReservation.reservation_date)
   // console.log("###", resDate)  
@@ -451,6 +496,9 @@ module.exports = {
   ],
   edit: [
     asyncErrorBoundary(reservationExists),
+    neEditBeforeCurrentDate,
+    noTuesdayEdit,
+    operationHoursEdit,
     ifFinished,
     validChanges,
     asyncErrorBoundary(edit)
