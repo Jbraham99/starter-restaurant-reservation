@@ -14,7 +14,7 @@ import "./Layout.css";
 function Layout() {
   return (
     <div className="container-fluid">
-      <div className="row h-100">
+      <div className="row h-100" id="wrapper" style={{minHeight: "100vh"}}>
         <div className="col-md-2 side-bar">
           <Menu />
         </div>
